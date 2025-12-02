@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { API_BASE_URL, getToken, clearToken } from '@/lib/api';
+import { API_BASE_URL, getToken } from '@/lib/api';
 
 interface User {
   _id: string;
@@ -22,7 +21,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -30,71 +29,33 @@ export default function UsersPage() {
 
   const fetchUsers = async () => {
     const token = getToken();
-    if (!token) {
-      router.push('/login');
-      return;
-    }
-
     try {
       const response = await fetch(`${API_BASE_URL}/users`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
-
-      if (response.status === 401) {
-        clearToken();
-        router.push('/login');
-        return;
-      }
-
       const data = await response.json();
       setUsers(data);
-      setIsLoading(false);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch users');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch users';
+      setError(errorMessage);
+    } finally {
       setIsLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    clearToken();
-    router.push('/login');
-  };
-
   const handleDelete = async (userId: string) => {
     if (!confirm('Are you sure you want to delete this user?')) return;
-
     const token = getToken();
     try {
       const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
-
       if (response.ok) {
         setUsers(users.filter(u => u._id !== userId));
       }
-    } catch (err: any) {
+    } catch {
       alert('Failed to delete user');
-    }
-  };
-
-  const handleUpdateStatus = async (userId: string, newStatus: string) => {
-    const token = getToken();
-    try {
-      const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-        method: 'PUT',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      if (response.ok) {
-        fetchUsers();
-      }
-    } catch (err: any) {
-      alert('Failed to update status');
     }
   };
 
@@ -107,7 +68,7 @@ export default function UsersPage() {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (response.ok) fetchUsers();
-    } catch (err: any) {
+    } catch {
       alert('Failed to ban user');
     }
   };
@@ -121,7 +82,7 @@ export default function UsersPage() {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (response.ok) fetchUsers();
-    } catch (err: any) {
+    } catch {
       alert('Failed to suspend user');
     }
   };
@@ -135,7 +96,7 @@ export default function UsersPage() {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (response.ok) fetchUsers();
-    } catch (err: any) {
+    } catch {
       alert('Failed to reactivate user');
     }
   };
@@ -153,7 +114,7 @@ export default function UsersPage() {
         body: JSON.stringify({ role: newRole }),
       });
       if (response.ok) fetchUsers();
-    } catch (err: any) {
+    } catch {
       alert('Failed to change role');
     }
   };
@@ -177,152 +138,166 @@ export default function UsersPage() {
       if (response.ok) {
         alert('Password reset successful');
       }
-    } catch (err: any) {
+    } catch {
       alert('Failed to reset password');
     }
   };
 
+  const filteredUsers = users.filter(user => 
+    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.profile?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-          <div className="space-x-4">
-            <button
-              onClick={() => router.push('/admin/analytics')}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-            >
-              Analytics
-            </button>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              Logout
-            </button>
-          </div>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white">User Management</h1>
+          <p className="text-slate-400">Manage all platform users</p>
         </div>
-      </header>
+        <div className="flex items-center gap-3">
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={fetchUsers}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {error && (
-          <div className="p-4 mb-4 bg-red-50 border border-red-200 text-red-600 rounded">
-            {error}
+      {error && (
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {/* Users Table */}
+      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-700">
+          <h2 className="text-lg font-semibold text-white">All Users ({filteredUsers.length})</h2>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-slate-700/50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Role</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Verified</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Location</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Quick Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-700">
+              {filteredUsers.map((user) => (
+                <tr key={user._id} className="hover:bg-slate-700/30">
+                  <td className="px-6 py-4 text-sm font-medium text-white">
+                    {user.profile?.name || 'N/A'}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-slate-300">{user.email}</td>
+                  <td className="px-6 py-4 text-sm">
+                    <select
+                      value={user.role}
+                      onChange={(e) => handleChangeRole(user._id, e.target.value)}
+                      className="bg-slate-700 border border-slate-600 text-white rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                      <option value="superadmin">Super Admin</option>
+                    </select>
+                  </td>
+                  <td className="px-6 py-4 text-sm">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      user.status === 'active' ? 'bg-green-500/20 text-green-400' :
+                      user.status === 'suspended' ? 'bg-yellow-500/20 text-yellow-400' :
+                      'bg-red-500/20 text-red-400'
+                    }`}>
+                      {user.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm">
+                    {user.emailVerified ? (
+                      <span className="text-green-400">✓ Verified</span>
+                    ) : (
+                      <span className="text-slate-500">Not verified</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-slate-300">
+                    {user.profile?.country || 'N/A'}
+                    {user.profile?.region && `, ${user.profile.region}`}
+                  </td>
+                  <td className="px-6 py-4 text-sm space-x-2">
+                    {user.status !== 'banned' && (
+                      <button
+                        onClick={() => handleBan(user._id)}
+                        className="text-red-400 hover:text-red-300 text-xs"
+                      >
+                        Ban
+                      </button>
+                    )}
+                    {user.status !== 'suspended' && user.status !== 'banned' && (
+                      <button
+                        onClick={() => handleSuspend(user._id)}
+                        className="text-yellow-400 hover:text-yellow-300 text-xs"
+                      >
+                        Suspend
+                      </button>
+                    )}
+                    {(user.status === 'suspended' || user.status === 'banned') && (
+                      <button
+                        onClick={() => handleReactivate(user._id)}
+                        className="text-green-400 hover:text-green-300 text-xs"
+                      >
+                        Reactivate
+                      </button>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-sm space-x-2">
+                    <button
+                      onClick={() => handleResetPassword(user._id)}
+                      className="text-blue-400 hover:text-blue-300 text-xs"
+                    >
+                      Reset Password
+                    </button>
+                    <button
+                      onClick={() => handleDelete(user._id)}
+                      className="text-red-400 hover:text-red-300 text-xs"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {filteredUsers.length === 0 && (
+          <div className="text-center py-8 text-slate-400">
+            <span className="text-4xl mb-2 block">👥</span>
+            <p>No users found</p>
           </div>
         )}
-
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold">All Users ({users.length})</h2>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Verified</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quick Actions</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {users.map((user) => (
-                  <tr key={user._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {user.profile?.name || 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
-                    <td className="px-6 py-4 text-sm">
-                      <select
-                        value={user.role}
-                        onChange={(e) => handleChangeRole(user._id, e.target.value)}
-                        className="border border-gray-300 rounded px-2 py-1 text-xs"
-                      >
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
-                        <option value="superadmin">Super Admin</option>
-                      </select>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        user.status === 'active' ? 'bg-green-100 text-green-800' :
-                        user.status === 'suspended' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {user.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      {user.emailVerified ? (
-                        <span className="text-green-600">✓ Verified</span>
-                      ) : (
-                        <span className="text-gray-400">Not verified</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {user.profile?.country || 'N/A'}
-                      {user.profile?.region && `, ${user.profile.region}`}
-                    </td>
-                    <td className="px-6 py-4 text-sm space-x-2">
-                      {user.status !== 'banned' && (
-                        <button
-                          onClick={() => handleBan(user._id)}
-                          className="text-red-600 hover:text-red-800 text-xs"
-                        >
-                          Ban
-                        </button>
-                      )}
-                      {user.status !== 'suspended' && user.status !== 'banned' && (
-                        <button
-                          onClick={() => handleSuspend(user._id)}
-                          className="text-yellow-600 hover:text-yellow-800 text-xs"
-                        >
-                          Suspend
-                        </button>
-                      )}
-                      {(user.status === 'suspended' || user.status === 'banned') && (
-                        <button
-                          onClick={() => handleReactivate(user._id)}
-                          className="text-green-600 hover:text-green-800 text-xs"
-                        >
-                          Reactivate
-                        </button>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-sm space-x-2">
-                      <button
-                        onClick={() => handleResetPassword(user._id)}
-                        className="text-blue-600 hover:text-blue-800 text-xs"
-                      >
-                        Reset Password
-                      </button>
-                      <button
-                        onClick={() => handleDelete(user._id)}
-                        className="text-red-600 hover:text-red-800 text-xs"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }

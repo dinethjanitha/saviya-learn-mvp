@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { API_BASE_URL, getToken, clearToken } from '@/lib/api';
+import { useEffect, useState, useCallback } from 'react';
+import { API_BASE_URL, getToken } from '@/lib/api';
 
 interface Resource {
   _id: string;
@@ -24,14 +23,10 @@ interface Resource {
   createdAt: string;
 }
 
-interface ResourceAnalytics {
-  totalResources: number;
-  recentResources: number;
-  topViewed: Resource[];
-  topUploaders: Array<{
-    _id: string;
-    count: number;
-  }>;
+interface Group {
+  _id: string;
+  subject: string;
+  topic: string;
 }
 
 export default function ResourceManagementPage() {
@@ -41,54 +36,18 @@ export default function ResourceManagementPage() {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGroupId, setSelectedGroupId] = useState('');
-  const [groups, setGroups] = useState<any[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editForm, setEditForm] = useState({ title: '', description: '', link: '' });
-  const [analytics, setAnalytics] = useState<ResourceAnalytics | null>(null);
-  const [showAnalytics, setShowAnalytics] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     fetchGroups();
   }, []);
 
-  useEffect(() => {
-    if (selectedGroupId) {
-      fetchResources();
-    }
-  }, [searchQuery, selectedGroupId]);
-
-  const fetchGroups = async () => {
+  const fetchResources = useCallback(async () => {
     const token = getToken();
-    if (!token) {
-      router.push('/login');
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/groups?limit=1000`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-
-      if (response.status === 401) {
-        clearToken();
-        router.push('/login');
-        return;
-      }
-
-      const data = await response.json();
-      setGroups(data.groups || []);
-      setIsLoading(false);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch groups');
-      setIsLoading(false);
-    }
-  };
-
-  const fetchResources = async () => {
-    const token = getToken();
-    if (!token || !selectedGroupId) return;
+    if (!selectedGroupId) return;
 
     try {
       let url = `${API_BASE_URL}/resources/group/${selectedGroupId}?`;
@@ -98,46 +57,41 @@ export default function ResourceManagementPage() {
         headers: { 'Authorization': `Bearer ${token}` },
       });
 
-      if (response.status === 401) {
-        clearToken();
-        router.push('/login');
-        return;
-      }
-
       const data = await response.json();
       setResources(data.resources || []);
       setTotal(data.total || 0);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch resources');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch resources';
+      setError(errorMessage);
     }
-  };
+  }, [searchQuery, selectedGroupId]);
 
-  const fetchAnalytics = async () => {
+  useEffect(() => {
+    if (selectedGroupId) {
+      fetchResources();
+    }
+  }, [fetchResources, selectedGroupId]);
+
+  const fetchGroups = async () => {
     const token = getToken();
-    if (!token) return;
-
     try {
-      const response = await fetch(`${API_BASE_URL}/resource-analytics`, {
+      const response = await fetch(`${API_BASE_URL}/groups?limit=1000`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setAnalytics(data);
-        setShowAnalytics(true);
-      }
-    } catch (err: any) {
-      alert('Failed to fetch analytics');
+      const data = await response.json();
+      setGroups(data.groups || []);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch groups';
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const handleLogout = () => {
-    clearToken();
-    router.push('/login');
   };
 
   const handleView = (resource: Resource) => {
     setSelectedResource(resource);
+    setShowEditModal(false);
   };
 
   const handleEdit = (resource: Resource) => {
@@ -150,16 +104,17 @@ export default function ResourceManagementPage() {
     setShowEditModal(true);
   };
 
-  const handleUpdateResource = async () => {
+  const handleUpdateResource = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!selectedResource) return;
-    const token = getToken();
 
+    const token = getToken();
     try {
       const response = await fetch(`${API_BASE_URL}/resources/${selectedResource._id}`, {
         method: 'PUT',
-        headers: {
+        headers: { 
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(editForm),
       });
@@ -169,241 +124,204 @@ export default function ResourceManagementPage() {
         setSelectedResource(null);
         fetchResources();
         alert('Resource updated successfully');
-      } else {
-        const data = await response.json();
-        alert(data.message || 'Failed to update resource');
       }
-    } catch (err: any) {
+    } catch {
       alert('Failed to update resource');
     }
   };
 
   const handleDelete = async (resourceId: string) => {
-    if (!confirm('Delete this resource permanently?')) return;
+    if (!confirm('Delete this resource?')) return;
     const token = getToken();
-
     try {
       const response = await fetch(`${API_BASE_URL}/resources/${resourceId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
-
-      if (response.ok) {
-        fetchResources();
-        setSelectedResource(null);
-        alert('Resource deleted successfully');
-      } else {
-        const data = await response.json();
-        alert(data.message || 'Failed to delete resource');
-      }
-    } catch (err: any) {
+      if (response.ok) fetchResources();
+    } catch {
       alert('Failed to delete resource');
     }
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Resource Management</h1>
-          <div className="space-x-4">
-            <button
-              onClick={fetchAnalytics}
-              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Resource Management</h1>
+          <p className="text-slate-400">Manage educational resources by group</p>
+        </div>
+      </div>
+
+      {error && (
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {/* Group Selection */}
+      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-slate-300 mb-1">Select Group</label>
+            <select
+              value={selectedGroupId}
+              onChange={(e) => setSelectedGroupId(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              View Analytics
-            </button>
-            <button
-              onClick={() => router.push('/admin/users')}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Users
-            </button>
-            <button
-              onClick={() => router.push('/admin/groups')}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-            >
-              Groups
-            </button>
-            <button
-              onClick={() => router.push('/admin/sessions')}
-              className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-            >
-              Sessions
-            </button>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              Logout
-            </button>
+              <option value="">Choose a group...</option>
+              {groups.map((group) => (
+                <option key={group._id} value={group._id}>
+                  {group.subject} - {group.topic}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1">Search</label>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search resources..."
+              disabled={!selectedGroupId}
+              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            />
           </div>
         </div>
-      </header>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {error && (
-          <div className="p-4 mb-4 bg-red-50 border border-red-200 text-red-600 rounded">
-            {error}
+      {/* Resources Grid */}
+      {selectedGroupId ? (
+        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-700 flex justify-between items-center">
+            <h2 className="text-lg font-semibold text-white">Resources ({total})</h2>
+            <button
+              onClick={fetchResources}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
+            >
+              Refresh
+            </button>
           </div>
-        )}
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Select Group</label>
-              <select
-                value={selectedGroupId}
-                onChange={(e) => setSelectedGroupId(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              >
-                <option value="">-- Select a Group --</option>
-                {groups.map((group) => (
-                  <option key={group._id} value={group._id}>
-                    {group.subject} - {group.topic} (Grade {group.grade})
-                  </option>
-                ))}
-              </select>
+          {resources.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+              {resources.map((resource) => (
+                <div
+                  key={resource._id}
+                  className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 hover:bg-slate-700 transition"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">
+                        {resource.type === 'video' ? '🎬' : 
+                         resource.type === 'document' ? '📄' : 
+                         resource.type === 'link' ? '🔗' : '📁'}
+                      </span>
+                      <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs">
+                        {resource.type}
+                      </span>
+                    </div>
+                    <span className="text-slate-400 text-xs">👁 {resource.views}</span>
+                  </div>
+
+                  <h3 className="text-white font-medium mb-1 line-clamp-1">{resource.title}</h3>
+                  {resource.description && (
+                    <p className="text-slate-400 text-sm mb-3 line-clamp-2">{resource.description}</p>
+                  )}
+
+                  <div className="text-xs text-slate-500 mb-3">
+                    {new Date(resource.createdAt).toLocaleDateString()}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleView(resource)}
+                      className="flex-1 px-3 py-1.5 bg-slate-600 text-white rounded text-xs hover:bg-slate-500 transition"
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={() => handleEdit(resource)}
+                      className="flex-1 px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-500 transition"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(resource._id)}
+                      className="px-3 py-1.5 bg-red-600 text-white rounded text-xs hover:bg-red-500 transition"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by title, description, link..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                disabled={!selectedGroupId}
-              />
+          ) : (
+            <div className="text-center py-12 text-slate-400">
+              <span className="text-4xl mb-2 block">📭</span>
+              <p>No resources found in this group</p>
             </div>
-            <div className="flex items-end">
-              <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setSelectedGroupId('');
-                }}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-              >
-                Clear Filters
-              </button>
-            </div>
-          </div>
+          )}
         </div>
-
-        {/* Resources Table */}
-        {selectedGroupId ? (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold">Resources ({total})</h2>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Uploaded By</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Views</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {resources.map((resource) => (
-                    <tr key={resource._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-900">{resource.title}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{resource.type}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {typeof resource.uploadedBy === 'object'
-                          ? resource.uploadedBy.name || resource.uploadedBy.email
-                          : 'Unknown'}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{resource.views}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {new Date(resource.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 text-sm space-x-2">
-                        <button
-                          onClick={() => handleView(resource)}
-                          className="text-blue-600 hover:text-blue-800 text-xs"
-                        >
-                          View
-                        </button>
-                        <button
-                          onClick={() => handleEdit(resource)}
-                          className="text-green-600 hover:text-green-800 text-xs"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(resource._id)}
-                          className="text-red-600 hover:text-red-800 text-xs"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-            Please select a group to view resources
-          </div>
-        )}
-      </main>
+      ) : (
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-12 text-center">
+          <span className="text-5xl mb-4 block">📚</span>
+          <h3 className="text-xl font-semibold text-white mb-2">Select a Group</h3>
+          <p className="text-slate-400">Choose a learning group above to view and manage its resources</p>
+        </div>
+      )}
 
       {/* View Resource Modal */}
       {selectedResource && !showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full p-6 mx-4">
             <div className="flex justify-between items-start mb-4">
-              <h2 className="text-2xl font-bold">Resource Details</h2>
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">
+                  {selectedResource.type === 'video' ? '🎬' : 
+                   selectedResource.type === 'document' ? '📄' : 
+                   selectedResource.type === 'link' ? '🔗' : '📁'}
+                </span>
+                <div>
+                  <h2 className="text-xl font-bold text-white">{selectedResource.title}</h2>
+                  <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs">
+                    {selectedResource.type}
+                  </span>
+                </div>
+              </div>
               <button
                 onClick={() => setSelectedResource(null)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-slate-400 hover:text-white text-xl"
               >
                 ✕
               </button>
             </div>
 
             <div className="space-y-4">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Title</p>
-                <p className="text-gray-900">{selectedResource.title}</p>
-              </div>
-
               {selectedResource.description && (
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Description</p>
-                  <p className="text-gray-900">{selectedResource.description}</p>
+                  <p className="text-sm font-medium text-slate-400">Description</p>
+                  <p className="text-white">{selectedResource.description}</p>
                 </div>
               )}
 
               <div>
-                <p className="text-sm font-medium text-gray-500">Type</p>
-                <p className="text-gray-900">{selectedResource.type}</p>
-              </div>
-
-              <div>
-                <p className="text-sm font-medium text-gray-500">Link</p>
-                <a
-                  href={selectedResource.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline break-all"
+                <p className="text-sm font-medium text-slate-400">Link</p>
+                <a 
+                  href={selectedResource.link} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="text-blue-400 hover:underline break-all"
                 >
                   {selectedResource.link}
                 </a>
@@ -411,192 +329,99 @@ export default function ResourceManagementPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Views</p>
-                  <p className="text-gray-900">{selectedResource.views}</p>
+                  <p className="text-sm font-medium text-slate-400">Views</p>
+                  <p className="text-white">{selectedResource.views}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Created</p>
-                  <p className="text-gray-900">
-                    {new Date(selectedResource.createdAt).toLocaleString()}
-                  </p>
+                  <p className="text-sm font-medium text-slate-400">Created</p>
+                  <p className="text-white">{new Date(selectedResource.createdAt).toLocaleString()}</p>
                 </div>
               </div>
+            </div>
 
-              <div>
-                <p className="text-sm font-medium text-gray-500">Group</p>
-                <p className="text-gray-900">
-                  {typeof selectedResource.groupId === 'object'
-                    ? `${selectedResource.groupId.subject} - ${selectedResource.groupId.topic}`
-                    : selectedResource.groupId}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm font-medium text-gray-500">Uploaded By</p>
-                <p className="text-gray-900">
-                  {typeof selectedResource.uploadedBy === 'object'
-                    ? selectedResource.uploadedBy.name || selectedResource.uploadedBy.email
-                    : selectedResource.uploadedBy}
-                </p>
-              </div>
+            <div className="flex gap-2 mt-6">
+              <a
+                href={selectedResource.link}
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-center"
+              >
+                Open Resource
+              </a>
+              <button
+                onClick={() => handleEdit(selectedResource)}
+                className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition"
+              >
+                Edit
+              </button>
             </div>
           </div>
         </div>
       )}
 
       {/* Edit Resource Modal */}
-      {showEditModal && selectedResource && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+      {selectedResource && showEditModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full p-6 mx-4">
             <div className="flex justify-between items-start mb-4">
-              <h2 className="text-2xl font-bold">Edit Resource</h2>
+              <h2 className="text-xl font-bold text-white">Edit Resource</h2>
               <button
-                onClick={() => {
-                  setShowEditModal(false);
-                  setSelectedResource(null);
-                }}
-                className="text-gray-500 hover:text-gray-700"
+                onClick={() => { setShowEditModal(false); setSelectedResource(null); }}
+                className="text-slate-400 hover:text-white text-xl"
               >
                 ✕
               </button>
             </div>
 
-            <div className="space-y-4">
+            <form onSubmit={handleUpdateResource} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Title</label>
                 <input
                   type="text"
                   value={editForm.title}
                   onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Description</label>
                 <textarea
                   value={editForm.description}
                   onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Link *</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Link</label>
                 <input
                   type="url"
                   value={editForm.link}
                   onChange={(e) => setEditForm({ ...editForm, link: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
 
-              <div className="flex justify-end space-x-3 pt-4">
+              <div className="flex justify-end gap-3 pt-4">
                 <button
-                  onClick={() => {
-                    setShowEditModal(false);
-                    setSelectedResource(null);
-                  }}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                  type="button"
+                  onClick={() => { setShowEditModal(false); setSelectedResource(null); }}
+                  className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={handleUpdateResource}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                 >
-                  Save Changes
+                  Update Resource
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Analytics Modal */}
-      {showAnalytics && analytics && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto p-6">
-            <div className="flex justify-between items-start mb-4">
-              <h2 className="text-2xl font-bold">Resource Analytics</h2>
-              <button
-                onClick={() => setShowAnalytics(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-6">
-              {/* Overview Stats */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <div className="text-sm font-medium text-blue-600 mb-1">Total Resources</div>
-                  <div className="text-3xl font-bold text-blue-900">{analytics.totalResources}</div>
-                </div>
-                <div className="bg-green-50 rounded-lg p-4">
-                  <div className="text-sm font-medium text-green-600 mb-1">Added (Last 7 Days)</div>
-                  <div className="text-3xl font-bold text-green-900">{analytics.recentResources}</div>
-                </div>
-              </div>
-
-              {/* Top Viewed Resources */}
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Top 10 Most Viewed Resources</h3>
-                <div className="border rounded-lg overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Rank</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Title</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Views</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Created</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {analytics.topViewed.map((resource, index) => (
-                        <tr key={resource._id}>
-                          <td className="px-4 py-2 text-sm text-gray-900">{index + 1}</td>
-                          <td className="px-4 py-2 text-sm text-gray-900">{resource.title}</td>
-                          <td className="px-4 py-2 text-sm text-gray-600">{resource.views}</td>
-                          <td className="px-4 py-2 text-sm text-gray-600">
-                            {new Date(resource.createdAt).toLocaleDateString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Top Uploaders */}
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Top 5 Most Active Uploaders</h3>
-                <div className="border rounded-lg overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Rank</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">User ID</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Resources Uploaded</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {analytics.topUploaders.map((uploader, index) => (
-                        <tr key={uploader._id}>
-                          <td className="px-4 py-2 text-sm text-gray-900">{index + 1}</td>
-                          <td className="px-4 py-2 text-sm text-gray-900">{uploader._id}</td>
-                          <td className="px-4 py-2 text-sm text-gray-600">{uploader.count}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+            </form>
           </div>
         </div>
       )}

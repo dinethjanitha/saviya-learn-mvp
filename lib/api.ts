@@ -6,15 +6,17 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 // Token management
 export const getToken = () => {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('token');
+  return localStorage.getItem('accessToken');
 };
 
 export const saveToken = (token: string) => {
-  localStorage.setItem('token', token);
+  localStorage.setItem('accessToken', token);
 };
 
 export const clearToken = () => {
-  localStorage.removeItem('token');
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('user');
 };
 
 // API base URL

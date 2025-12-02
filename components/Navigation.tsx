@@ -43,7 +43,7 @@ export default function Navigation({ user }: NavigationProps) {
   const userInitial = userName.charAt(0).toUpperCase();
 
   const navLinks = [
-    { href: '/dashboard', label: t('nav.dashboard'), icon: '' },
+    { href: '/home', label: t('nav.home'), icon: '' },
     { href: '/groups', label: t('nav.groups'), icon: '' },
     { href: '/help', label: t('nav.help'), icon: '' },
   ];
@@ -58,7 +58,7 @@ export default function Navigation({ user }: NavigationProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo/Brand */}
           <div 
-            onClick={() => router.push('/dashboard')}
+            onClick={() => router.push('/home')}
             className="flex items-center gap-2 cursor-pointer group"
           >
             <div className="text-2xl group-hover:scale-110 transition-transform duration-300"></div>

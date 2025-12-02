@@ -46,8 +46,27 @@ export default function HomePage() {
 
   const fetchHome = async () => {
     try {
-      const response = await axios.get('/users/dashboard');
-      setStats(response.data);
+      // Use existing endpoints to build stats
+      let userGroups: any[] = [];
+      try {
+        const groupsResponse = await axios.get('/groups/my?page=1&limit=50');
+        userGroups = groupsResponse.data.groups || [];
+      } catch (e) {
+        console.error('Error fetching groups:', e);
+      }
+
+      const dashboardStats = {
+        statistics: {
+          groupCount: userGroups.length,
+          sessionCount: user?.reputation?.sessionsAttended || 0,
+          resourceCount: user?.reputation?.resourcesShared || 0,
+          activeSessions: 0,
+        },
+        groups: userGroups,
+        recentActivity: [],
+      };
+
+      setStats(dashboardStats);
       setIsLoading(false);
       setTimeout(() => setIsLoaded(true), 100);
     } catch (err: any) {
