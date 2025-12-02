@@ -8,8 +8,7 @@ import { useLanguage } from '@/lib/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 
 const countries = [
-  'Sri Lanka', 'India', 'United States', 'United Kingdom', 'Canada', 'Australia',
-  'Germany', 'France', 'Japan', 'Singapore', 'Malaysia', 'Other'
+  'Sri Lanka'
 ];
 
 export default function SignupPage() {
