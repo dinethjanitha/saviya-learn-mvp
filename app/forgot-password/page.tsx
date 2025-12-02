@@ -5,6 +5,7 @@ import Link from 'next/link';
 import axios from '@/lib/axios';
 import { useLanguage } from '@/lib/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
+import { Lock, Mail, AlertCircle, CheckCircle, ArrowLeft, Loader2, Shield, Send } from 'lucide-react';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -42,74 +43,74 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-amber-50 via-orange-50 to-red-100 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 relative overflow-hidden px-4 py-8">
       {/* Language Selector */}
       <div className="absolute top-4 right-4 z-20">
         <LanguageSelector />
       </div>
 
-      {/* Animated Background Elements */}
+      {/* Background Pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-linear-to-br from-amber-300/30 to-orange-300/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '0s' }} />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-linear-to-br from-orange-300/30 to-red-300/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-linear-to-br from-yellow-200/20 to-amber-200/20 rounded-full blur-3xl animate-pulse-slow" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
+        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
       </div>
 
-      {/* Floating Decorations */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-[20%] text-4xl animate-float opacity-20" style={{ animationDelay: '0.5s' }}></div>
-        <div className="absolute bottom-32 right-[25%] text-3xl animate-float opacity-20" style={{ animationDelay: '1.5s' }}></div>
+      {/* Floating Icons */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
+        <Shield className="absolute top-20 left-[15%] w-12 h-12 text-white/10 animate-float" style={{ animationDelay: '0s' }} />
+        <Mail className="absolute bottom-32 right-[20%] w-10 h-10 text-white/10 animate-float" style={{ animationDelay: '1s' }} />
+        <Lock className="absolute top-40 right-[30%] w-8 h-8 text-white/10 animate-float" style={{ animationDelay: '2s' }} />
       </div>
 
-      <div className={`bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8 w-full max-w-md relative z-10 border border-white/50 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <div className={`bg-white/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md relative z-10 border border-white/50 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         {/* Header */}
-        <div className={`text-center mb-8 transition-all duration-500 delay-100 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-amber-500 to-orange-600 rounded-2xl mb-4 shadow-lg animate-bounce-in">
-            <span className="text-3xl"></span>
+        <div className={`text-center mb-6 sm:mb-8 transition-all duration-500 delay-100 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl mb-4 shadow-lg animate-bounce-in">
+            <Lock className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold bg-linear-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
             {t('forgotPassword.title')}
           </h1>
-          <p className="text-gray-600">{t('forgotPassword.subtitle')}</p>
+          <p className="text-sm sm:text-base text-gray-600">{t('forgotPassword.subtitle')}</p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl animate-shake flex items-center gap-3">
-            <span className="text-xl"></span>
-            <span>{error}</span>
+          <div className="mb-4 p-3 sm:p-4 bg-red-50 border-2 border-red-200 text-red-700 rounded-xl animate-shake flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <span className="text-sm sm:text-base">{error}</span>
           </div>
         )}
 
         {/* Success Message */}
         {success && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl animate-scale-in flex items-center gap-3">
-            <span className="text-xl"></span>
-            <span>{success}</span>
+          <div className="mb-4 p-3 sm:p-4 bg-green-50 border-2 border-green-200 text-green-700 rounded-xl animate-scale-in flex items-start gap-3">
+            <CheckCircle className="w-5 h-5 flex-shrink-0" />
+            <span className="text-sm sm:text-base">{success}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
           <div className={`transition-all duration-500 delay-200 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               {t('forgotPassword.emailLabel')}
             </label>
             <div className="relative group">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-amber-500 transition-colors"></span>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 bg-white/50 hover:bg-white focus:bg-white input-focus text-gray-900 placeholder-gray-400" placeholder={t('forgotPassword.emailPlaceholder')} required />
+              <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full pl-10 sm:pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-white/50 hover:bg-white focus:bg-white text-gray-900 placeholder-gray-400 text-base" placeholder={t('forgotPassword.emailPlaceholder')} required />
             </div>
           </div>
 
           <div className={`transition-all duration-500 delay-300 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-            <button type="submit" disabled={isLoading} className="w-full bg-linear-to-r from-amber-500 to-orange-500 text-white py-3 rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] btn-animate flex items-center justify-center gap-2">
+            <button type="submit" disabled={isLoading} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 sm:py-3.5 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] flex items-center justify-center gap-2 text-base">
               {isLoading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                   <span>{t('forgotPassword.sending')}</span>
                 </>
               ) : (
                 <>
-                  <span></span>
+                  <Send className="w-5 h-5" />
                   <span>{t('forgotPassword.sendButton')}</span>
                 </>
               )}
@@ -117,9 +118,9 @@ export default function ForgotPasswordPage() {
           </div>
         </form>
 
-        <div className={`mt-6 text-center transition-all duration-500 delay-400 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <Link href="/login" className="inline-flex items-center gap-2 text-amber-600 hover:text-amber-700 font-semibold hover:underline transition-all duration-200">
-            <span></span>
+        <div className={`mt-5 sm:mt-6 text-center transition-all duration-500 delay-400 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <Link href="/login" className="inline-flex items-center gap-2 text-white hover:text-white/90 font-semibold hover:underline transition-all duration-200 text-sm sm:text-base">
+            <ArrowLeft className="w-4 h-4" />
             <span>{t('forgotPassword.backToLogin')}</span>
           </Link>
         </div>
