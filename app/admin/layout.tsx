@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { clearToken } from '@/lib/api';
 import { getToken, getUser } from '@/lib/axios';
-import { AdminThemeProvider, useAdminTheme } from '@/context';
+import { AdminThemeProvider, useAdminTheme, AdminToastProvider, useAdminToast } from '@/context';
 
 interface User {
   _id: string;
@@ -31,7 +31,9 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { theme, toggleTheme, isDark } = useAdminTheme();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { isDark, toggleTheme } = useAdminTheme();
+  const { showToast } = useAdminToast();
 
   useEffect(() => {
     const checkAuth = () => {
@@ -57,8 +59,23 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
 
   const handleLogout = () => {
     clearToken();
+    showToast('Logged out successfully', 'success');
     router.push('/login');
   };
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    showToast('Refreshing data...', 'info', 2000);
+    
+    // Trigger a page refresh by re-navigating
+    router.refresh();
+    
+    // Simulate refresh delay for visual feedback
+    setTimeout(() => {
+      setIsRefreshing(false);
+      showToast('Data refreshed successfully!', 'success');
+    }, 1000);
+  }, [router, showToast]);
 
   if (isLoading) {
     return (
@@ -173,6 +190,17 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              {/* Refresh Button */}
+              <button
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className={`p-2 rounded-xl transition ${isDark ? 'bg-slate-700 text-blue-400 hover:bg-slate-600' : 'bg-gray-100 text-blue-600 hover:bg-blue-50'} ${isRefreshing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                title="Refresh Data"
+              >
+                <svg className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
@@ -228,7 +256,9 @@ export default function AdminLayout({
 }) {
   return (
     <AdminThemeProvider>
-      <AdminLayoutContent>{children}</AdminLayoutContent>
+      <AdminToastProvider>
+        <AdminLayoutContent>{children}</AdminLayoutContent>
+      </AdminToastProvider>
     </AdminThemeProvider>
   );
 }

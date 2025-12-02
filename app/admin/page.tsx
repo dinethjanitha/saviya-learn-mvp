@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { API_BASE_URL, getToken } from '@/lib/api';
 import Link from 'next/link';
-import { useAdminTheme } from '@/context';
+import { useAdminTheme, useAdminToast } from '@/context';
 
 interface DashboardStats {
   totalUsers: number;
@@ -23,9 +23,11 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { isDark } = useAdminTheme();
+  const { showToast } = useAdminToast();
 
   useEffect(() => {
     fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchStats = async () => {
@@ -37,9 +39,12 @@ export default function AdminDashboard() {
       if (response.ok) {
         const data = await response.json();
         setStats(data);
+      } else {
+        showToast('Failed to load dashboard stats', 'error');
       }
     } catch (error) {
       console.error('Failed to fetch stats:', error);
+      showToast('Failed to connect to server', 'error');
     } finally {
       setIsLoading(false);
     }

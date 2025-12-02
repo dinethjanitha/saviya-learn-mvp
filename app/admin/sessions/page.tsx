@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { API_BASE_URL, getToken } from '@/lib/api';
-import { useAdminTheme } from '@/context';
+import { useAdminTheme, useAdminToast } from '@/context';
 
 interface Session {
   _id: string;
@@ -37,6 +37,7 @@ interface SessionAnalytics {
 
 export default function SessionManagementPage() {
   const { isDark } = useAdminTheme();
+  const { showToast, showConfirm } = useAdminToast();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,10 +63,11 @@ export default function SessionManagementPage() {
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch sessions';
       setError(errorMessage);
+      showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
-  }, [statusFilter]);
+  }, [statusFilter, showToast]);
 
   useEffect(() => {
     fetchSessions();
@@ -95,12 +97,20 @@ export default function SessionManagementPage() {
       });
       setShowAnalytics(true);
     } catch {
-      alert('Failed to fetch analytics');
+      showToast('Failed to fetch analytics', 'error');
     }
   };
 
   const handleDelete = async (sessionId: string) => {
-    if (!confirm('Delete this session permanently?')) return;
+    const confirmed = await showConfirm({
+      title: 'Delete Session',
+      message: 'Delete this session permanently? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+    });
+    if (!confirmed) return;
+    
     const token = getToken();
     try {
       const response = await fetch(`${API_BASE_URL}/sessions/admin/delete`, {
@@ -114,9 +124,10 @@ export default function SessionManagementPage() {
       if (response.ok) {
         fetchSessions();
         setSelectedSession(null);
+        showToast('Session deleted successfully', 'success');
       }
     } catch {
-      alert('Failed to delete session');
+      showToast('Failed to delete session', 'error');
     }
   };
 
@@ -152,12 +163,6 @@ export default function SessionManagementPage() {
             className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
           >
             📊 Analytics
-          </button>
-          <button
-            onClick={fetchSessions}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            Refresh
           </button>
         </div>
       </div>

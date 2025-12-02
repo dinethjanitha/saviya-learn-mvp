@@ -7,7 +7,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { API_BASE_URL, getToken } from '@/lib/api';
-import { useAdminTheme } from '@/context';
+import { useAdminTheme, useAdminToast } from '@/context';
 
 interface GroupMember {
   userId: string;
@@ -36,6 +36,7 @@ interface Group {
 
 export default function GroupManagementPage() {
   const { isDark } = useAdminTheme();
+  const { showToast, showConfirm } = useAdminToast();
   const [groups, setGroups] = useState<Group[]>([]);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,45 +63,76 @@ export default function GroupManagementPage() {
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch groups';
       setError(errorMessage);
+      showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, statusFilter]);
+  }, [searchQuery, statusFilter, showToast]);
 
   useEffect(() => {
     fetchGroups();
   }, [fetchGroups]);
 
   const handleArchive = async (groupId: string) => {
-    if (!confirm('Archive this group?')) return;
+    const confirmed = await showConfirm({
+      title: 'Archive Group',
+      message: 'Are you sure you want to archive this group?',
+      confirmText: 'Archive',
+      cancelText: 'Cancel',
+      type: 'warning',
+    });
+    if (!confirmed) return;
+    
     const token = getToken();
     try {
       const response = await fetch(`${API_BASE_URL}/groups/${groupId}?archive=true`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      if (response.ok) fetchGroups();
+      if (response.ok) {
+        fetchGroups();
+        showToast('Group archived successfully', 'success');
+      }
     } catch {
-      alert('Failed to archive group');
+      showToast('Failed to archive group', 'error');
     }
   };
 
   const handleDelete = async (groupId: string) => {
-    if (!confirm('Permanently delete this group? This cannot be undone!')) return;
+    const confirmed = await showConfirm({
+      title: 'Delete Group',
+      message: 'Permanently delete this group? This action cannot be undone!',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+    });
+    if (!confirmed) return;
+    
     const token = getToken();
     try {
       const response = await fetch(`${API_BASE_URL}/groups/${groupId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      if (response.ok) fetchGroups();
+      if (response.ok) {
+        fetchGroups();
+        showToast('Group deleted successfully', 'success');
+      }
     } catch {
-      alert('Failed to delete group');
+      showToast('Failed to delete group', 'error');
     }
   };
 
   const handleRemoveMember = async (groupId: string, userId: string) => {
-    if (!confirm('Remove this member from the group?')) return;
+    const confirmed = await showConfirm({
+      title: 'Remove Member',
+      message: 'Remove this member from the group?',
+      confirmText: 'Remove',
+      cancelText: 'Cancel',
+      type: 'warning',
+    });
+    if (!confirmed) return;
+    
     const token = getToken();
     try {
       const response = await fetch(`${API_BASE_URL}/groups/${groupId}/members/${userId}`, {
@@ -108,19 +140,27 @@ export default function GroupManagementPage() {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (response.ok) {
-        alert('Member removed');
+        showToast('Member removed successfully', 'success');
         fetchGroups();
         if (selectedGroup?._id === groupId) {
           setSelectedGroup(null);
         }
       }
     } catch {
-      alert('Failed to remove member');
+      showToast('Failed to remove member', 'error');
     }
   };
 
   const handleChangeMemberRole = async (groupId: string, userId: string, newRole: string) => {
-    if (!confirm(`Change member role to ${newRole}?`)) return;
+    const confirmed = await showConfirm({
+      title: 'Change Member Role',
+      message: `Change member role to "${newRole}"?`,
+      confirmText: 'Change Role',
+      cancelText: 'Cancel',
+      type: 'info',
+    });
+    if (!confirmed) return;
+    
     const token = getToken();
     try {
       const response = await fetch(`${API_BASE_URL}/groups/${groupId}/members/${userId}/role`, {
@@ -132,11 +172,11 @@ export default function GroupManagementPage() {
         body: JSON.stringify({ role: newRole }),
       });
       if (response.ok) {
-        alert('Member role updated');
+        showToast('Member role updated successfully', 'success');
         fetchGroups();
       }
     } catch {
-      alert('Failed to change member role');
+      showToast('Failed to change member role', 'error');
     }
   };
 
@@ -171,10 +211,10 @@ export default function GroupManagementPage() {
         setShowEditModal(false);
         setSelectedGroup(null);
         fetchGroups();
-        alert('Group updated successfully');
+        showToast('Group updated successfully', 'success');
       }
     } catch {
-      alert('Failed to update group');
+      showToast('Failed to update group', 'error');
     }
   };
 
@@ -194,12 +234,6 @@ export default function GroupManagementPage() {
           <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Group Management</h1>
           <p className={isDark ? 'text-slate-400' : 'text-gray-600'}>Manage all learning groups</p>
         </div>
-        <button
-          onClick={fetchGroups}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          Refresh
-        </button>
       </div>
 
       {error && (

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { API_BASE_URL, getToken } from '@/lib/api';
-import { useAdminTheme } from '@/context';
+import { useAdminTheme, useAdminToast } from '@/context';
 
 interface Resource {
   _id: string;
@@ -32,6 +32,7 @@ interface Group {
 
 export default function ResourceManagementPage() {
   const { isDark } = useAdminTheme();
+  const { showToast, showConfirm } = useAdminToast();
   const [resources, setResources] = useState<Resource[]>([]);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,24 +126,39 @@ export default function ResourceManagementPage() {
         setShowEditModal(false);
         setSelectedResource(null);
         fetchResources();
-        alert('Resource updated successfully');
+        showToast('Resource updated successfully', 'success');
+      } else {
+        showToast('Failed to update resource', 'error');
       }
     } catch {
-      alert('Failed to update resource');
+      showToast('Failed to update resource', 'error');
     }
   };
 
   const handleDelete = async (resourceId: string) => {
-    if (!confirm('Delete this resource?')) return;
+    const confirmed = await showConfirm({
+      title: 'Delete Resource',
+      message: 'Are you sure you want to delete this resource? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger'
+    });
+    if (!confirmed) return;
+    
     const token = getToken();
     try {
       const response = await fetch(`${API_BASE_URL}/resources/${resourceId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      if (response.ok) fetchResources();
+      if (response.ok) {
+        showToast('Resource deleted successfully', 'success');
+        fetchResources();
+      } else {
+        showToast('Failed to delete resource', 'error');
+      }
     } catch {
-      alert('Failed to delete resource');
+      showToast('Failed to delete resource', 'error');
     }
   };
 
@@ -207,12 +223,6 @@ export default function ResourceManagementPage() {
         <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white/80 backdrop-blur-sm border-gray-200'} border rounded-xl overflow-hidden shadow-xl`}>
           <div className={`px-6 py-4 border-b ${isDark ? 'border-slate-700' : 'border-gray-200'} flex justify-between items-center`}>
             <h2 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Resources ({total})</h2>
-            <button
-              onClick={fetchResources}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
-            >
-              Refresh
-            </button>
           </div>
 
           {resources.length > 0 ? (

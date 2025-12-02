@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { API_BASE_URL, getToken } from '@/lib/api';
-import { useAdminTheme } from '@/context';
+import { useAdminTheme, useAdminToast } from '@/context';
 
 interface User {
   _id: string;
@@ -24,9 +24,11 @@ export default function UsersPage() {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const { isDark } = useAdminTheme();
+  const { showToast, showConfirm } = useAdminToast();
 
   useEffect(() => {
     fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchUsers = async () => {
@@ -40,13 +42,22 @@ export default function UsersPage() {
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch users';
       setError(errorMessage);
+      showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+    const confirmed = await showConfirm({
+      title: 'Delete User',
+      message: 'Are you sure you want to delete this user? This action cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+    });
+    if (!confirmed) return;
+    
     const token = getToken();
     try {
       const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
@@ -55,56 +66,98 @@ export default function UsersPage() {
       });
       if (response.ok) {
         setUsers(users.filter(u => u._id !== userId));
+        showToast('User deleted successfully', 'success');
       }
     } catch {
-      alert('Failed to delete user');
+      showToast('Failed to delete user', 'error');
     }
   };
 
   const handleBan = async (userId: string) => {
-    if (!confirm('Ban this user?')) return;
+    const confirmed = await showConfirm({
+      title: 'Ban User',
+      message: 'Are you sure you want to ban this user? They will not be able to access the platform.',
+      confirmText: 'Ban User',
+      cancelText: 'Cancel',
+      type: 'danger',
+    });
+    if (!confirmed) return;
+    
     const token = getToken();
     try {
       const response = await fetch(`${API_BASE_URL}/users/${userId}/ban`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      if (response.ok) fetchUsers();
+      if (response.ok) {
+        fetchUsers();
+        showToast('User banned successfully', 'success');
+      }
     } catch {
-      alert('Failed to ban user');
+      showToast('Failed to ban user', 'error');
     }
   };
 
   const handleSuspend = async (userId: string) => {
-    if (!confirm('Suspend this user?')) return;
+    const confirmed = await showConfirm({
+      title: 'Suspend User',
+      message: 'Are you sure you want to suspend this user temporarily?',
+      confirmText: 'Suspend',
+      cancelText: 'Cancel',
+      type: 'warning',
+    });
+    if (!confirmed) return;
+    
     const token = getToken();
     try {
       const response = await fetch(`${API_BASE_URL}/users/${userId}/suspend`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      if (response.ok) fetchUsers();
+      if (response.ok) {
+        fetchUsers();
+        showToast('User suspended successfully', 'success');
+      }
     } catch {
-      alert('Failed to suspend user');
+      showToast('Failed to suspend user', 'error');
     }
   };
 
   const handleReactivate = async (userId: string) => {
-    if (!confirm('Reactivate this user?')) return;
+    const confirmed = await showConfirm({
+      title: 'Reactivate User',
+      message: 'Are you sure you want to reactivate this user?',
+      confirmText: 'Reactivate',
+      cancelText: 'Cancel',
+      type: 'info',
+    });
+    if (!confirmed) return;
+    
     const token = getToken();
     try {
       const response = await fetch(`${API_BASE_URL}/users/${userId}/reactivate`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      if (response.ok) fetchUsers();
+      if (response.ok) {
+        fetchUsers();
+        showToast('User reactivated successfully', 'success');
+      }
     } catch {
-      alert('Failed to reactivate user');
+      showToast('Failed to reactivate user', 'error');
     }
   };
 
   const handleChangeRole = async (userId: string, newRole: string) => {
-    if (!confirm(`Change user role to ${newRole}?`)) return;
+    const confirmed = await showConfirm({
+      title: 'Change User Role',
+      message: `Are you sure you want to change this user's role to "${newRole}"?`,
+      confirmText: 'Change Role',
+      cancelText: 'Cancel',
+      type: 'warning',
+    });
+    if (!confirmed) return;
+    
     const token = getToken();
     try {
       const response = await fetch(`${API_BASE_URL}/users/${userId}/role`, {
@@ -115,16 +168,19 @@ export default function UsersPage() {
         },
         body: JSON.stringify({ role: newRole }),
       });
-      if (response.ok) fetchUsers();
+      if (response.ok) {
+        fetchUsers();
+        showToast('Role changed successfully', 'success');
+      }
     } catch {
-      alert('Failed to change role');
+      showToast('Failed to change role', 'error');
     }
   };
 
   const handleResetPassword = async (userId: string) => {
     const newPassword = prompt('Enter new password (min 6 characters):');
     if (!newPassword || newPassword.length < 6) {
-      alert('Password must be at least 6 characters');
+      showToast('Password must be at least 6 characters', 'warning');
       return;
     }
     const token = getToken();
@@ -138,10 +194,10 @@ export default function UsersPage() {
         body: JSON.stringify({ newPassword }),
       });
       if (response.ok) {
-        alert('Password reset successful');
+        showToast('Password reset successful', 'success');
       }
     } catch {
-      alert('Failed to reset password');
+      showToast('Failed to reset password', 'error');
     }
   };
 
@@ -174,12 +230,6 @@ export default function UsersPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDark ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'}`}
           />
-          <button
-            onClick={fetchUsers}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            Refresh
-          </button>
         </div>
       </div>
 
