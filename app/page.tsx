@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getUser } from '@/lib/axios';
 import { useLanguage } from '@/lib/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
+import { BookOpen } from 'lucide-react';
 
 // Typewriter Animation Hook - loops continuously
 function useTypewriter(text: string, speed: number = 50, pauseDuration: number = 2000) {
@@ -163,7 +164,7 @@ export default function LandingPage() {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <div className="flex items-center gap-2 group cursor-pointer">
-              <span className="text-3xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">📚</span>
+              <BookOpen className="w-10 h-10 text-blue-600 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
               <span className="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">{t('common.appName')}</span>
             </div>
 
@@ -377,7 +378,7 @@ export default function LandingPage() {
             {/* Brand Section */}
             <div className="lg:col-span-1">
               <div className="flex items-center gap-3 mb-6 group cursor-pointer">
-                <span className="text-3xl transition-transform duration-300 group-hover:scale-110">📚</span>
+                <BookOpen className="w-10 h-10 text-blue-600 transition-transform duration-300 group-hover:scale-110" />
                 <span className="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors duration-300">{t('common.appName')}</span>
               </div>
               <p className="text-sm leading-relaxed text-gray-400">

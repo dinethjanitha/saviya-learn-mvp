@@ -6,6 +6,7 @@ import axios, { getUser, clearToken } from '@/lib/axios';
 import { getSocket } from '@/lib/socket';
 import Navigation from '@/components/Navigation';
 import { LanguageProvider } from '@/lib/LanguageContext';
+import { Paperclip, Send, BookOpen, Lock, Crown, Star, Check, Users, User, Calendar, MessageSquare, LogOut, X, UserPlus, Edit2, Plus, CalendarClock, Link as LinkIcon, CircleDot, CheckCircle, XCircle, Trash2, Reply } from 'lucide-react';
 
 interface Member {
   userId: string | {
@@ -250,7 +251,7 @@ export default function GroupDetailsPage() {
     try {
       const response = await axios.post('/chat/send', {
         groupId,
-        message: `📎 Shared resource: ${resource.title}`,
+        message: `Shared resource: ${resource.title}`,
         type: 'text',
         resourceId: resource._id,
         resourceLink: resource.link,
@@ -415,17 +416,23 @@ export default function GroupDetailsPage() {
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className="px-4 py-1.5 bg-linear-to-r from-blue-100 to-blue-50 text-blue-700 text-sm font-bold rounded-full border border-blue-200">
-                  📚 Grade {group.grade}
+                <span className="px-4 py-1.5 bg-linear-to-r from-blue-100 to-blue-50 text-blue-700 text-sm font-bold rounded-full border border-blue-200 flex items-center gap-1.5">
+                  <BookOpen className="w-4 h-4" /> Grade {group.grade}
                 </span>
                 {group.groupType === 'private' && (
-                  <span className="px-4 py-1.5 bg-linear-to-r from-purple-100 to-purple-50 text-purple-700 text-sm font-bold rounded-full border border-purple-200">
-                    🔒 Private
+                  <span className="px-4 py-1.5 bg-linear-to-r from-purple-100 to-purple-50 text-purple-700 text-sm font-bold rounded-full border border-purple-200 flex items-center gap-1.5">
+                    <Lock className="w-4 h-4" /> Private
                   </span>
                 )}
                 {isMember && (
-                  <span className="px-4 py-1.5 bg-linear-to-r from-green-100 to-green-50 text-green-700 text-sm font-bold rounded-full border border-green-200">
-                    {userRole === 'owner' ? '👑 Owner' : userRole === 'admin' ? '⭐ Admin' : '✓ Member'}
+                  <span className="px-4 py-1.5 bg-linear-to-r from-green-100 to-green-50 text-green-700 text-sm font-bold rounded-full border border-green-200 flex items-center gap-1.5">
+                    {userRole === 'owner' ? (
+                      <><Crown className="w-4 h-4" /> Owner</>
+                    ) : userRole === 'admin' ? (
+                      <><Star className="w-4 h-4" /> Admin</>
+                    ) : (
+                      <><Check className="w-4 h-4" /> Member</>
+                    )}
                   </span>
                 )}
               </div>
@@ -436,15 +443,15 @@ export default function GroupDetailsPage() {
               )}
               <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">👥</span>
+                  <Users className="w-5 h-5 text-blue-600" />
                   <span className="font-medium">{memberCount}/{group.maxMembers} members</span>
                 </div>
                 <div className="hidden sm:flex items-center gap-2">
-                  <span className="text-lg">👤</span>
+                  <User className="w-5 h-5 text-indigo-600" />
                   <span>Created by {group.createdBy.profile?.name || group.createdBy.email}</span>
                 </div>
                 <div className="hidden sm:flex items-center gap-2">
-                  <span className="text-lg">📅</span>
+                  <Calendar className="w-5 h-5 text-purple-600" />
                   <span>{new Date(group.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
@@ -455,7 +462,7 @@ export default function GroupDetailsPage() {
                   onClick={() => setShowEditModal(true)}
                   className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium flex items-center gap-2"
                 >
-                  ✏️ Edit Group
+                  <Edit2 className="w-4 h-4" /> Edit Group
                 </button>
               )}
               {user?.role === 'admin' ? (
@@ -471,8 +478,8 @@ export default function GroupDetailsPage() {
                       WhatsApp Group
                     </a>
                   )}
-                  <div className="px-6 py-2 bg-purple-100 text-purple-700 rounded-lg font-medium text-center">
-                    👑 Admin Access
+                  <div className="px-6 py-2 bg-purple-100 text-purple-700 rounded-lg font-medium text-center flex items-center justify-center gap-2">
+                    <Crown className="w-5 h-5" /> Admin Access
                   </div>
                 </>
               ) : isMember ? (
@@ -483,16 +490,16 @@ export default function GroupDetailsPage() {
                       href={group.whatsappLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full lg:w-auto px-6 py-3 bg-linear-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl hover:scale-105 font-medium text-center"
+                      className="w-full lg:w-auto px-6 py-3 bg-linear-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl hover:scale-105 font-medium text-center flex items-center justify-center gap-2"
                     >
-                      💬 WhatsApp Group
+                      <MessageSquare className="w-5 h-5" /> WhatsApp Group
                     </a>
                   )}
                   <button
                     onClick={handleLeaveGroup}
-                    className="w-full lg:w-auto px-6 py-3 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl font-medium"
+                    className="w-full lg:w-auto px-6 py-3 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl font-medium flex items-center justify-center gap-2"
                   >
-                    🚪 Leave Group
+                    <LogOut className="w-5 h-5" /> Leave Group
                   </button>
                 </>
               ) : (
@@ -500,13 +507,17 @@ export default function GroupDetailsPage() {
                 <button
                   onClick={handleJoinGroup}
                   disabled={memberCount >= group.maxMembers}
-                  className={`w-full lg:w-auto px-8 py-3 rounded-xl transition-all font-bold shadow-lg ${
+                  className={`w-full lg:w-auto px-8 py-3 rounded-xl transition-all font-bold shadow-lg flex items-center justify-center gap-2 ${
                     memberCount >= group.maxMembers
                       ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
                       : 'bg-linear-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl hover:scale-105'
                   }`}
                 >
-                  {memberCount >= group.maxMembers ? '❌ Group Full' : '➕ Join Group'}
+                  {memberCount >= group.maxMembers ? (
+                    <><X className="w-5 h-5" /> Group Full</>
+                  ) : (
+                    <><UserPlus className="w-5 h-5" /> Join Group</>
+                  )}
                 </button>
               )}
             </div>
@@ -768,7 +779,7 @@ function ChatTab({ messages, newMessage, setNewMessage, onSendMessage, isSending
 
   return (
     <div className="flex flex-col h-[calc(100vh-400px)] sm:h-[500px] min-h-[400px] max-h-[600px]">
-      <div className="flex-1 overflow-y-auto mb-4 space-y-3 px-1 sm:px-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+      <div className="flex-1 overflow-y-auto mb-4 space-y-3 px-1 sm:px-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
         {messages.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <div className="text-4xl sm:text-5xl mb-3">💬</div>
@@ -780,8 +791,8 @@ function ChatTab({ messages, newMessage, setNewMessage, onSendMessage, isSending
             const hasResource = msg.resourceId && msg.resourceLink;
             const hasReply = msg.replyTo;
             return (
-              <div key={msg._id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[70%] group`}>
+              <div key={msg._id} className={`flex ${isOwn ? 'justify-end pl-12' : 'justify-start'} pr-12`}>
+                <div className={`max-w-[70%] relative`}>
                   {!isOwn && msg.userId && (
                     <div className="text-xs text-gray-600 mb-1">
                       {msg.userId.profile?.name || msg.userId.email || 'Unknown User'}
@@ -798,13 +809,23 @@ function ChatTab({ messages, newMessage, setNewMessage, onSendMessage, isSending
                         </div>
                       </div>
                     )}
-                    <button
-                      onClick={() => setReplyingTo(msg)}
-                      className={`absolute -right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded ${isOwn ? 'bg-blue-500 hover:bg-blue-400' : 'bg-gray-300 hover:bg-gray-400'} text-xs`}
-                      title="Reply"
-                    >
-                      ↩️
-                    </button>
+                    {isOwn ? (
+                      <button
+                        onClick={() => setReplyingTo(msg)}
+                        className="absolute -left-10 top-2 transition-all p-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white shadow-md hover:shadow-lg hover:scale-110 active:scale-95 border border-white/30"
+                        title="Reply"
+                      >
+                        <Reply className="w-3.5 h-3.5 text-black" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setReplyingTo(msg)}
+                        className="absolute -right-10 top-2 transition-all p-1.5 rounded-full bg-white hover:bg-gray-50 text-gray-600 shadow-md hover:shadow-lg hover:scale-110 active:scale-95 border border-gray-200"
+                        title="Reply"
+                      >
+                        <Reply className="w-3.5 h-3.5 text-black" />
+                      </button>
+                    )}
                     <p className="whitespace-pre-wrap break-all">{msg.message}</p>
                     
                     {hasResource && msg.resourceId && (
@@ -887,10 +908,10 @@ function ChatTab({ messages, newMessage, setNewMessage, onSendMessage, isSending
         <button
           type="button"
           onClick={onAttachResource}
-          className="p-2 sm:p-3 bg-linear-to-r from-gray-100 to-gray-200 text-gray-700 rounded-xl hover:from-gray-200 hover:to-gray-300 transition-all shadow-md hover:shadow-lg active:scale-95 flex-shrink-0"
+          className="p-2 sm:p-3 bg-linear-to-r from-gray-100 to-gray-200 text-gray-700 rounded-xl hover:from-gray-200 hover:to-gray-300 transition-all shadow-md hover:shadow-lg active:scale-95 flex-shrink-0 flex items-center justify-center"
           title="Attach Resource"
         >
-          <span className="text-lg sm:text-xl">📎</span>
+          <Paperclip className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
         <input
           type="text"
@@ -906,10 +927,10 @@ function ChatTab({ messages, newMessage, setNewMessage, onSendMessage, isSending
         <button
           type="submit"
           disabled={isSending || !newMessage.trim()}
-          className="px-3 sm:px-5 md:px-6 py-2 sm:py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-medium disabled:from-gray-400 disabled:to-gray-400 shadow-lg hover:shadow-xl active:scale-95 flex-shrink-0 text-sm sm:text-base"
+          className="px-3 sm:px-5 md:px-6 py-2 sm:py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-medium disabled:from-gray-400 disabled:to-gray-400 shadow-lg hover:shadow-xl active:scale-95 flex-shrink-0 text-sm sm:text-base flex items-center justify-center"
         >
           <span className="hidden sm:inline">{isSending ? 'Sending...' : 'Send'}</span>
-          <span className="sm:hidden text-lg">✉️</span>
+          <Send className="sm:hidden w-5 h-5" />
         </button>
       </form>
 
@@ -1049,17 +1070,17 @@ function ResourcesTab({ groupId, user }: { groupId: string; user: any }) {
             onChange={(e) => setSortBy(e.target.value)}
             className="w-full sm:w-auto px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 font-medium shadow-sm"
           >
-            <option value="newest">📅 Newest First</option>
-            <option value="oldest">📅 Oldest First</option>
-            <option value="a-z">🔤 A to Z</option>
-            <option value="z-a">🔤 Z to A</option>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="a-z">A to Z</option>
+            <option value="z-a">Z to A</option>
           </select>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
           className="w-full sm:w-auto px-6 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-medium flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
         >
-          <span className="text-xl">+</span>
+          <Plus className="w-5 h-5" />
           <span>Add Resource</span>
         </button>
       </div>
@@ -1124,7 +1145,7 @@ function ResourcesTab({ groupId, user }: { groupId: string; user: any }) {
         </>
       ) : (
         <div className="text-center py-12">
-          <div className="text-6xl mb-4">📚</div>
+          <BookOpen className="w-20 h-20 mx-auto mb-4 text-gray-400" />
           <p className="text-gray-500 mb-4">
             {searchQuery ? 'No resources found matching your search' : 'No resources shared yet'}
           </p>
@@ -1439,7 +1460,7 @@ function SessionsTab({ groupId, user, isMember }: { groupId: string; user: any; 
           onClick={() => setShowScheduleModal(true)}
           className="w-full sm:w-auto px-6 py-3 bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all font-medium flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
         >
-          <span className="text-xl">+</span>
+          <CalendarClock className="w-5 h-5" />
           Schedule Session
         </button>
       </div>
@@ -1464,7 +1485,7 @@ function SessionsTab({ groupId, user, isMember }: { groupId: string; user: any; 
         </div>
       ) : (
         <div className="text-center py-12">
-          <div className="text-6xl mb-4">📅</div>
+          <CalendarClock className="w-20 h-20 mx-auto mb-4 text-gray-400" />
           <p className="text-gray-500 mb-4">
             {filterStatus === 'all' ? 'No sessions scheduled yet' : `No ${filterStatus} sessions`}
           </p>
@@ -1504,11 +1525,19 @@ function SessionCard({ session, isTeacher, isJoined, onJoin, onLeave, onStart, o
     cancelled: 'bg-red-100 text-red-800',
   };
 
-  const statusIcons = {
-    scheduled: '📅',
-    ongoing: '🔴',
-    completed: '✅',
-    cancelled: '❌',
+  const StatusIcon = ({ status }: { status: string }) => {
+    switch (status) {
+      case 'scheduled':
+        return <Calendar className="w-4 h-4" />;
+      case 'ongoing':
+        return <CircleDot className="w-4 h-4" />;
+      case 'completed':
+        return <CheckCircle className="w-4 h-4" />;
+      case 'cancelled':
+        return <XCircle className="w-4 h-4" />;
+      default:
+        return null;
+    }
   };
 
   const scheduledDate = new Date(session.scheduledAt);
@@ -1521,8 +1550,8 @@ function SessionCard({ session, isTeacher, isJoined, onJoin, onLeave, onStart, o
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <h3 className="text-xl font-semibold text-gray-900">{session.title}</h3>
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[session.status as keyof typeof statusColors] || statusColors.scheduled}`}>
-              {statusIcons[session.status as keyof typeof statusIcons] || statusIcons.scheduled} {session.status.toUpperCase()}
+            <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${statusColors[session.status as keyof typeof statusColors] || statusColors.scheduled}`}>
+              <StatusIcon status={session.status} /> {session.status.toUpperCase()}
             </span>
             {isTeacher && <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">👨‍🏫 Teacher</span>}
           </div>
@@ -1560,7 +1589,7 @@ function SessionCard({ session, isTeacher, isJoined, onJoin, onLeave, onStart, o
               className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
               title="Delete Session"
             >
-              🗑️
+              <Trash2 className="w-4 h-4" />
             </button>
           </div>
         )}
@@ -1574,7 +1603,7 @@ function SessionCard({ session, isTeacher, isJoined, onJoin, onLeave, onStart, o
             rel="noopener noreferrer"
             className="text-blue-600 hover:underline text-sm font-medium flex items-center gap-2"
           >
-            🔗 Join Meeting Link
+            <LinkIcon className="w-4 h-4" /> Join Meeting Link
           </a>
         </div>
       )}

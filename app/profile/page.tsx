@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import axios, { getUser, clearToken } from '@/lib/axios';
 import Navigation from '@/components/Navigation';
 import { LanguageProvider } from '@/lib/LanguageContext';
+import { Frown, Trophy, GraduationCap, BookOpen, User, Globe, MapPin, FileText, Save, Lightbulb, Target, Book, Trash2 } from 'lucide-react';
 
 interface UserProfile {
   _id: string;
@@ -128,7 +129,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 via-indigo-50 to-purple-100">
         <div className="text-center animate-fade-in">
-          <div className="text-6xl mb-4">😕</div>
+          <Frown className="w-20 h-20 mx-auto mb-4 text-gray-400" />
           <p className="text-gray-600 mb-4">Failed to load profile</p>
           <button 
             onClick={() => router.push('/home')}
@@ -213,21 +214,21 @@ export default function ProfilePage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">🏆</span>
+                      <Trophy className="w-7 h-7 text-yellow-600" />
                       <span className="text-gray-700 font-medium">Points</span>
                     </div>
                     <span className="text-2xl font-bold text-yellow-600">{profile.reputation.points}</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">🎓</span>
+                      <GraduationCap className="w-7 h-7 text-green-600" />
                       <span className="text-gray-700 font-medium">Sessions</span>
                     </div>
                     <span className="text-2xl font-bold text-green-600">{profile.reputation.sessionsTaught}</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">📚</span>
+                      <BookOpen className="w-7 h-7 text-blue-600" />
                       <span className="text-gray-700 font-medium">Resources</span>
                     </div>
                     <span className="text-2xl font-bold text-blue-600">{profile.reputation.resourcesShared}</span>
@@ -241,7 +242,9 @@ export default function ProfilePage() {
               {/* Profile Details */}
               <div className={`bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 transition-all duration-700 delay-150 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
-                  <span className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">👤</span>
+                  <span className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <User className="w-5 h-5 text-blue-600" />
+                  </span>
                   Profile Details
                 </h3>
 
@@ -257,17 +260,23 @@ export default function ProfilePage() {
                         <p className="text-gray-900 font-medium">{profile.email}</p>
                       </div>
                       <div className="p-4 bg-gray-50 rounded-xl">
-                        <p className="text-sm font-medium text-gray-500 mb-1">🌍 Country</p>
+                        <p className="text-sm font-medium text-gray-500 mb-1 flex items-center gap-1.5">
+                          <Globe className="w-4 h-4 text-blue-600" /> Country
+                        </p>
                         <p className="text-gray-900 font-medium">{profile.profile.country || 'Not specified'}</p>
                       </div>
                       <div className="p-4 bg-gray-50 rounded-xl">
-                        <p className="text-sm font-medium text-gray-500 mb-1">📍 Region</p>
+                        <p className="text-sm font-medium text-gray-500 mb-1 flex items-center gap-1.5">
+                          <MapPin className="w-4 h-4 text-indigo-600" /> Region
+                        </p>
                         <p className="text-gray-900 font-medium">{profile.profile.region || 'Not specified'}</p>
                       </div>
                     </div>
                     {profile.profile.bio && (
                       <div className="p-4 bg-gray-50 rounded-xl">
-                        <p className="text-sm font-medium text-gray-500 mb-1">📝 Bio</p>
+                        <p className="text-sm font-medium text-gray-500 mb-1 flex items-center gap-1.5">
+                          <FileText className="w-4 h-4 text-purple-600" /> Bio
+                        </p>
                         <p className="text-gray-900">{profile.profile.bio}</p>
                       </div>
                     )}
@@ -299,7 +308,9 @@ export default function ProfilePage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">🌍 Country</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
+                          <Globe className="w-4 h-4 text-blue-600" /> Country
+                        </label>
                         <input
                           type="text"
                           value={editForm.country}
@@ -309,7 +320,9 @@ export default function ProfilePage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">📍 Region</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
+                          <MapPin className="w-4 h-4 text-indigo-600" /> Region
+                        </label>
                         <input
                           type="text"
                           value={editForm.region}
@@ -320,7 +333,9 @@ export default function ProfilePage() {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">📝 Bio</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
+                        <FileText className="w-4 h-4 text-purple-600" /> Bio
+                      </label>
                       <textarea
                         value={editForm.bio}
                         onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
@@ -341,7 +356,7 @@ export default function ProfilePage() {
                         </>
                       ) : (
                         <>
-                          <span>💾</span>
+                          <Save className="w-5 h-5" />
                           <span>Save Changes</span>
                         </>
                       )}
@@ -354,7 +369,9 @@ export default function ProfilePage() {
               <div className={`bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 transition-all duration-700 delay-250 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
-                    <span className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">💡</span>
+                    <span className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                      <Lightbulb className="w-5 h-5 text-green-600" />
+                    </span>
                     Skills & Expertise
                   </h3>
                   {isEditing && (
@@ -369,7 +386,7 @@ export default function ProfilePage() {
                 
                 {skills.length === 0 ? (
                   <div className="text-center py-12 bg-gray-50 rounded-xl">
-                    <div className="text-5xl mb-3">🎯</div>
+                    <Target className="w-16 h-16 mx-auto mb-3 text-gray-400" />
                     <p className="text-gray-500 mb-2">No skills added yet</p>
                     <p className="text-gray-400 text-sm">Add your skills to help others find you for peer learning</p>
                     {isEditing && (
@@ -391,7 +408,7 @@ export default function ProfilePage() {
                         {!isEditing ? (
                           <div>
                             <div className="font-semibold text-gray-900 flex items-center gap-2 mb-2">
-                              <span>📖</span> {skill.subject}
+                              <Book className="w-4 h-4 text-blue-600" /> {skill.subject}
                             </div>
                             <div className="text-sm text-gray-600 mb-2">
                               {skill.topics.map((topic, i) => (
@@ -438,9 +455,9 @@ export default function ProfilePage() {
                               </select>
                               <button
                                 onClick={() => removeSkill(index)}
-                                className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all duration-300"
+                                className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all duration-300 flex items-center justify-center"
                               >
-                                🗑️
+                                <Trash2 className="w-5 h-5" />
                               </button>
                             </div>
                           </div>

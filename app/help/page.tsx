@@ -6,6 +6,7 @@ import axios from '@/lib/axios';
 import { getUser } from '@/lib/axios';
 import Navigation from '@/components/Navigation';
 import { LanguageProvider } from '@/lib/LanguageContext';
+import { Handshake, Search, BookOpen, FileText, Link as LinkIcon } from 'lucide-react';
 
 interface Request {
   _id: string;
@@ -168,14 +169,15 @@ export default function CommunityHelpPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Community Help 🤝</h1>
+                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                  Community Help <Handshake className="w-8 h-8 text-blue-600" />
+                </h1>
                 <p className="text-gray-600 mt-1">Request or share educational resources with the community</p>
               </div>
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="px-6 py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-medium flex items-center gap-2 hover:scale-105 hover:shadow-lg"
               >
-                <span className="text-xl">+</span>
                 New Request
               </button>
             </div>
@@ -247,7 +249,7 @@ export default function CommunityHelpPage() {
           </div>
         ) : (
           <div className="text-center py-12 bg-white rounded-lg">
-            <div className="text-6xl mb-4">🔍</div>
+            <Search className="w-20 h-20 mx-auto mb-4 text-gray-400" />
             <p className="text-gray-500 mb-4">No requests found</p>
             {activeTab === 'my' && (
               <button
@@ -550,13 +552,13 @@ function RequestDetailModal({ request, currentUserId, onClose, onRespond, onMark
 
             <div className="flex flex-wrap gap-2 mb-4">
               <span className="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded">
-                📚 {request.subject}
+                <BookOpen className="w-5 h-5 text-blue-600 inline-block mr-1" /> {request.subject}
               </span>
-              <span className="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded">
-                📖 {request.topic}
+              <span className="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded flex items-center gap-1">
+                <FileText className="w-4 h-4 text-purple-600" /> {request.topic}
               </span>
-              <span className="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded">
-                📝 {request.type}
+              <span className="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded flex items-center gap-1">
+                <FileText className="w-4 h-4 text-indigo-600" /> {request.type}
               </span>
             </div>
 
@@ -613,7 +615,7 @@ function RequestDetailModal({ request, currentUserId, onClose, onRespond, onMark
                     </p>
                     {response.resourceId && (
                       <div className="text-blue-600 text-sm flex items-center gap-1">
-                        🔗 Shared Resource: {response.resourceId.title || 'Untitled'}
+                        <LinkIcon className="w-4 h-4" /> Shared Resource: {response.resourceId.title || 'Untitled'}
                         {response.resourceId.fileUrl && (
                           <a
                             href={response.resourceId.fileUrl}
