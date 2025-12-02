@@ -883,14 +883,14 @@ function ChatTab({ messages, newMessage, setNewMessage, onSendMessage, isSending
         </div>
       )}
 
-      <form onSubmit={onSendMessage} className="flex gap-2 items-end sticky bottom-0 bg-white p-3 rounded-xl shadow-lg">
+      <form onSubmit={onSendMessage} className="flex gap-1.5 sm:gap-2 items-end sticky bottom-0 bg-white p-2 sm:p-3 rounded-xl shadow-lg">
         <button
           type="button"
           onClick={onAttachResource}
-          className="p-3 bg-linear-to-r from-gray-100 to-gray-200 text-gray-700 rounded-xl hover:from-gray-200 hover:to-gray-300 transition-all shadow-md hover:shadow-lg active:scale-95"
+          className="p-2 sm:p-3 bg-linear-to-r from-gray-100 to-gray-200 text-gray-700 rounded-xl hover:from-gray-200 hover:to-gray-300 transition-all shadow-md hover:shadow-lg active:scale-95 flex-shrink-0"
           title="Attach Resource"
         >
-          <span className="text-xl">📎</span>
+          <span className="text-lg sm:text-xl">📎</span>
         </button>
         <input
           type="text"
@@ -900,16 +900,16 @@ function ChatTab({ messages, newMessage, setNewMessage, onSendMessage, isSending
             if (onTyping) onTyping();
           }}
           placeholder="Type a message..."
-          className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400 text-base"
+          className="flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400 text-sm sm:text-base"
           disabled={isSending}
         />
         <button
           type="submit"
           disabled={isSending || !newMessage.trim()}
-          className="px-5 sm:px-6 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-medium disabled:from-gray-400 disabled:to-gray-400 shadow-lg hover:shadow-xl active:scale-95"
+          className="px-3 sm:px-5 md:px-6 py-2 sm:py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all font-medium disabled:from-gray-400 disabled:to-gray-400 shadow-lg hover:shadow-xl active:scale-95 flex-shrink-0 text-sm sm:text-base"
         >
           <span className="hidden sm:inline">{isSending ? 'Sending...' : 'Send'}</span>
-          <span className="sm:hidden text-xl">✉️</span>
+          <span className="sm:hidden text-lg">✉️</span>
         </button>
       </form>
 

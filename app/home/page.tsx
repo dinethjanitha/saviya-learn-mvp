@@ -6,6 +6,7 @@ import axios, { getUser, clearToken } from '@/lib/axios';
 import { useLanguage } from '@/lib/LanguageContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import Navigation from '@/components/Navigation';
+import { Users, BookOpen, TrendingUp, Zap, FileText, Search, PlusCircle, HelpCircle, Calendar, Trophy, Award, Target, MessageSquare, LogOut as LogOutIcon } from 'lucide-react';
 
 interface HomeStats {
   statistics: {
@@ -172,28 +173,31 @@ export default function HomePage() {
                 {t('home.welcomeSubtitle')}
               </p>
             </div>
-            <div className="text-7xl animate-bounce-in hidden md:block"></div>
+            <TrendingUp className="w-20 h-20 animate-bounce-in hidden md:block" />
           </div>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {[
-            { label: t('home.stats.myGroups'), value: stats?.statistics.groupCount || 0, icon: '', color: 'blue', delay: '150' },
-            { label: t('home.stats.sessionsJoined'), value: stats?.statistics.sessionCount || 0, icon: '', color: 'green', delay: '200' },
-            { label: t('home.stats.activeNow'), value: stats?.statistics.activeSessions || 0, icon: '', color: 'purple', delay: '250' },
-            { label: t('home.stats.resources'), value: stats?.statistics.resourceCount || 0, icon: '', color: 'orange', delay: '300' },
-          ].map((stat) => (
+            { label: t('home.stats.myGroups'), value: stats?.statistics.groupCount || 0, icon: Users, color: 'blue', delay: '150' },
+            { label: t('home.stats.sessionsJoined'), value: stats?.statistics.sessionCount || 0, icon: Calendar, color: 'green', delay: '200' },
+            { label: t('home.stats.activeNow'), value: stats?.statistics.activeSessions || 0, icon: Zap, color: 'purple', delay: '250' },
+            { label: t('home.stats.resources'), value: stats?.statistics.resourceCount || 0, icon: FileText, color: 'orange', delay: '300' },
+          ].map((stat) => {
+            const IconComponent = stat.icon;
+            return (
             <div key={stat.label} className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border-l-4 border-${stat.color}-500 card-hover transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${stat.delay}ms` }}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-500">{stat.label}</p>
                   <p className={`text-3xl font-bold text-${stat.color}-600 mt-2`}>{stat.value}</p>
                 </div>
-                <div className="text-4xl hover:scale-125 transition-transform duration-300">{stat.icon}</div>
+                <IconComponent className={`w-10 h-10 text-${stat.color}-500 opacity-60 hover:scale-125 transition-transform duration-300`} />
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
@@ -201,10 +205,10 @@ export default function HomePage() {
           <div className={`lg:col-span-2 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 transition-all duration-700 delay-300 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                <span></span> {t('home.myLearningGroups')}
+                <Users className="w-6 h-6 text-blue-600" /> {t('home.myLearningGroups')}
               </h2>
               <button onClick={() => router.push('/groups')} className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all duration-200">
-                {t('home.viewAll')} <span></span>
+                {t('home.viewAll')} <Search className="w-4 h-4" />
               </button>
             </div>
             {stats?.groups && stats.groups.length > 0 ? (
@@ -220,21 +224,21 @@ export default function HomePage() {
                             {t('home.grade')} {group.grade}
                           </span>
                           <span className="text-xs text-gray-500 flex items-center gap-1">
-                            <span></span> {group.memberCount} {t('home.members')}
+                            <Users className="w-3 h-3" /> {group.memberCount} {t('home.members')}
                           </span>
                         </div>
                       </div>
-                      <div className="text-2xl hover:scale-110 transition-transform"></div>
+                      <BookOpen className="w-6 h-6 text-blue-500 hover:scale-110 transition-transform" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-12 animate-fade-in">
-                <div className="text-6xl mb-4 animate-bounce-in"></div>
+                <Users className="w-20 h-20 text-gray-300 mx-auto mb-4 animate-bounce-in" />
                 <p className="text-gray-500 mb-4">{t('home.noGroups')}</p>
-                <button onClick={() => router.push('/groups')} className="px-6 py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-medium hover:scale-105 hover:shadow-lg">
-                   {t('home.exploreGroups')}
+                <button onClick={() => router.push('/groups')} className="px-6 py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-medium hover:scale-105 hover:shadow-lg flex items-center gap-2 mx-auto">
+                  <Search className="w-5 h-5" /> {t('home.exploreGroups')}
                 </button>
               </div>
             )}
@@ -243,25 +247,25 @@ export default function HomePage() {
           {/* Recent Activity */}
           <div className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 transition-all duration-700 delay-400 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-              <span></span> {t('home.recentActivity')}
+              <TrendingUp className="w-6 h-6 text-indigo-600" /> {t('home.recentActivity')}
             </h2>
             {stats?.recentActivity && stats.recentActivity.length > 0 ? (
               <div className="space-y-3">
                 {stats.recentActivity.slice(0, 6).map((activity, index) => {
-                  const actionIcons: { [key: string]: string } = {
-                    'joined_group': '',
-                    'left_group': '',
-                    'joined_session': '',
-                    'uploaded_resource': '',
-                    'created_group': '',
-                    'completed_session': '',
-                    'resource_create': '',
-                    'name_change': '',
+                  const actionIconsMap: { [key: string]: any } = {
+                    'joined_group': Users,
+                    'left_group': LogOutIcon,
+                    'joined_session': Calendar,
+                    'uploaded_resource': FileText,
+                    'created_group': PlusCircle,
+                    'completed_session': Target,
+                    'resource_create': FileText,
+                    'name_change': Users,
                   };
-                  const userName = activity.userId?.profile?.name || activity.userId?.email || 'You';
+                  const IconComponent = actionIconsMap[activity.actionType] || MessageSquare;
                   return (
                     <div key={activity._id} className="flex items-start gap-3 border-l-2 border-blue-500 pl-3 py-2 hover:bg-blue-50/50 transition-all duration-200 rounded-r-lg animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
-                      <div className="text-xl">{actionIcons[activity.actionType] || ''}</div>
+                      <IconComponent className="w-5 h-5 text-blue-600 flex-shrink-0" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900">
                           <span className="capitalize">{activity.actionType.replace(/_/g, ' ')}</span>
@@ -274,7 +278,7 @@ export default function HomePage() {
               </div>
             ) : (
               <div className="text-center py-8 animate-fade-in">
-                <div className="text-5xl mb-3 animate-bounce-in"></div>
+                <TrendingUp className="w-16 h-16 text-gray-300 mx-auto mb-3 animate-bounce-in" />
                 <p className="text-sm text-gray-500">{t('home.noActivity')}</p>
               </div>
             )}
@@ -284,23 +288,23 @@ export default function HomePage() {
         {/* Quick Actions */}
         <div className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 mb-8 transition-all duration-700 delay-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <span></span> {t('home.quickActions')}
+            <Zap className="w-6 h-6 text-yellow-500" /> {t('home.quickActions')}
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <button onClick={() => router.push('/groups')} className="p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 transition-all duration-300 group hover:scale-105 hover:shadow-lg">
-              <div className="text-4xl mb-3 group-hover:scale-125 transition-transform duration-300"></div>
+              <Search className="w-10 h-10 text-blue-500 mb-3 mx-auto group-hover:scale-125 transition-transform duration-300" />
               <div className="text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">{t('home.actions.exploreGroups')}</div>
             </button>
             <button onClick={() => router.push('/groups')} className="p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-green-500 hover:bg-green-50/50 transition-all duration-300 group hover:scale-105 hover:shadow-lg">
-              <div className="text-4xl mb-3 group-hover:scale-125 transition-transform duration-300"></div>
+              <PlusCircle className="w-10 h-10 text-green-500 mb-3 mx-auto group-hover:scale-125 transition-transform duration-300" />
               <div className="text-sm font-medium text-gray-700 group-hover:text-green-600 transition-colors">{t('home.actions.createGroup')}</div>
             </button>
             <button onClick={() => router.push('/help')} className="p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50/50 transition-all duration-300 group hover:scale-105 hover:shadow-lg">
-              <div className="text-4xl mb-3 group-hover:scale-125 transition-transform duration-300"></div>
+              <HelpCircle className="w-10 h-10 text-purple-500 mb-3 mx-auto group-hover:scale-125 transition-transform duration-300" />
               <div className="text-sm font-medium text-gray-700 group-hover:text-purple-600 transition-colors">{t('home.actions.getHelp')}</div>
             </button>
             <button className="p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-orange-500 hover:bg-orange-50/50 transition-all duration-300 group hover:scale-105 hover:shadow-lg">
-              <div className="text-4xl mb-3 group-hover:scale-125 transition-transform duration-300"></div>
+              <Calendar className="w-10 h-10 text-orange-500 mb-3 mx-auto group-hover:scale-125 transition-transform duration-300" />
               <div className="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors">{t('home.actions.scheduleSession')}</div>
             </button>
           </div>
@@ -314,18 +318,21 @@ export default function HomePage() {
               <div className="absolute bottom-0 left-1/4 w-32 h-32 bg-white/10 rounded-full translate-y-1/2" />
             </div>
             <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 relative z-10">
-              <span className="animate-pulse"></span> {t('home.yourImpact')}
+              <Trophy className="w-6 h-6 animate-pulse" /> {t('home.yourImpact')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
               <div className="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <Award className="w-10 h-10 mx-auto mb-2 text-yellow-300" />
                 <p className="text-4xl font-bold mb-2">{user.reputation.points || 0}</p>
                 <p className="text-sm text-indigo-100">{t('home.reputation.points')}</p>
               </div>
               <div className="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <Calendar className="w-10 h-10 mx-auto mb-2 text-green-300" />
                 <p className="text-4xl font-bold mb-2">{user.reputation.sessionsTaught || 0}</p>
                 <p className="text-sm text-indigo-100">{t('home.reputation.sessionsTaught')}</p>
               </div>
               <div className="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <FileText className="w-10 h-10 mx-auto mb-2 text-blue-300" />
                 <p className="text-4xl font-bold mb-2">{user.reputation.resourcesShared || 0}</p>
                 <p className="text-sm text-indigo-100">{t('home.reputation.resourcesShared')}</p>
               </div>
