@@ -168,17 +168,17 @@ export default function CommunityHelpPage() {
 
         {/* Page Header */}
         <div className="bg-white/80 backdrop-blur-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex items-center justify-between">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                  Community Help <Handshake className="w-8 h-8 text-blue-600" />
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+                  Community Help <Handshake className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
                 </h1>
-                <p className="text-gray-600 mt-1">Request or share educational resources with the community</p>
+                <p className="text-gray-600 mt-1 text-sm sm:text-base">Request or share educational resources with the community</p>
               </div>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-6 py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-medium flex items-center gap-2 hover:scale-105 hover:shadow-lg"
+                className="hidden sm:flex px-6 py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-medium items-center gap-2 hover:scale-105 hover:shadow-lg"
               >
                 New Request
               </button>
@@ -187,37 +187,40 @@ export default function CommunityHelpPage() {
       </div>
 
       {/* Tabs and Filters */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <div className="flex flex-col gap-4 mb-6">
+          {/* Tabs */}
           <div className="flex gap-2">
             <button
               onClick={() => setActiveTab('all')}
-              className={`px-6 py-2 rounded-lg font-medium transition ${
-                activeTab === 'all'
+              className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-lg font-medium transition text-sm sm:text-base ${activeTab === 'all'
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
-              All Requests ({requests.length})
+              <span className="hidden sm:inline">All Requests</span>
+              <span className="sm:hidden">All</span>
+              <span className="ml-1">({requests.length})</span>
             </button>
             <button
               onClick={() => setActiveTab('my')}
-              className={`px-6 py-2 rounded-lg font-medium transition ${
-                activeTab === 'my'
+              className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-lg font-medium transition text-sm sm:text-base ${activeTab === 'my'
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
-              My Requests ({myRequests.length})
+              <span className="hidden sm:inline">My Requests</span>
+              <span className="sm:hidden">Mine</span>
+              <span className="ml-1">({myRequests.length})</span>
             </button>
           </div>
 
-          <div className="flex gap-3">
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-            >
+              className="flex-1 sm:flex-none px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white text-sm sm:text-base">
               <option value="all">All Status</option>
               <option value="open">Open</option>
               <option value="fulfilled">Fulfilled</option>
@@ -227,8 +230,7 @@ export default function CommunityHelpPage() {
             <select
               value={filterSubject}
               onChange={(e) => setFilterSubject(e.target.value)}
-              className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-            >
+              className="flex-1 sm:flex-none px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white text-sm sm:text-base">
               <option value="all">All Subjects</option>
               {uniqueSubjects.map((subject) => (
                 <option key={subject} value={subject}>{subject}</option>
@@ -264,6 +266,15 @@ export default function CommunityHelpPage() {
           </div>
         )}
       </div>
+
+      {/* Mobile Floating Action Button */}
+      <button
+        onClick={() => setShowCreateModal(true)}
+        className="sm:hidden fixed right-4 bottom-4 w-14 h-14 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-full shadow-2xl hover:shadow-blue-500/50 hover:from-blue-700 hover:to-indigo-700 transition-all hover:scale-110 active:scale-95 flex items-center justify-center z-50"
+        aria-label="New Request"
+      >
+        <span className="text-3xl font-light">+</span>
+      </button>
 
       {/* Modals */}
       {showCreateModal && (
@@ -360,9 +371,12 @@ function CreateRequestModal({ onClose, onSubmit }: any) {
   const fetchMyGroups = async () => {
     try {
       const response = await axios.get('/groups/my');
-      setGroups(response.data || []);
+      // Handle both { groups: [...] } and direct array response formats
+      const groupsData = response.data?.groups || response.data || [];
+      setGroups(Array.isArray(groupsData) ? groupsData : []);
     } catch (err) {
       console.error('Failed to fetch groups:', err);
+      setGroups([]);
     }
   };
 

@@ -176,19 +176,19 @@ export default function HomePage() {
       {/* Shared Navigation */}
       <Navigation user={user} />
 
-      <main className="max-w-7xl mx-auto px-4 py-8 relative z-10">
+      <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8 relative z-10">
         {/* Welcome Section */}
-        <div className={`bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl shadow-2xl p-8 mb-8 text-white relative overflow-hidden transition-all duration-700 delay-100 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className={`bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl shadow-2xl p-5 sm:p-8 mb-6 sm:mb-8 text-white relative overflow-hidden transition-all duration-700 delay-100 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 animate-pulse-slow" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 animate-pulse-slow" style={{ animationDelay: '1s' }} />
           </div>
           <div className="flex items-center justify-between relative z-10">
             <div>
-              <h2 className="text-3xl font-bold mb-2 animate-fade-in">
+              <h2 className="text-xl sm:text-3xl font-bold mb-2 animate-fade-in">
                 {t('home.welcome')}, {user?.profile?.name || t('home.student')}! 
               </h2>
-              <p className="text-blue-100 text-lg animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <p className="text-blue-100 text-sm sm:text-lg animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 {t('home.welcomeSubtitle')}
               </p>
             </div>
@@ -197,7 +197,7 @@ export default function HomePage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           {[
             { label: t('home.stats.myGroups'), value: stats?.statistics.groupCount || 0, icon: Users, color: 'blue', delay: '150' },
             { label: t('home.stats.sessionsJoined'), value: stats?.statistics.sessionCount || 0, icon: Calendar, color: 'green', delay: '200' },
@@ -206,13 +206,13 @@ export default function HomePage() {
           ].map((stat) => {
             const IconComponent = stat.icon;
             return (
-            <div key={stat.label} className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border-l-4 border-${stat.color}-500 card-hover transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${stat.delay}ms` }}>
+            <div key={stat.label} className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-${stat.color}-500 card-hover transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${stat.delay}ms` }}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">{stat.label}</p>
-                  <p className={`text-3xl font-bold text-${stat.color}-600 mt-2`}>{stat.value}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-500">{stat.label}</p>
+                  <p className={`text-xl sm:text-3xl font-bold text-${stat.color}-600 mt-1 sm:mt-2`}>{stat.value}</p>
                 </div>
-                <IconComponent className={`w-10 h-10 text-${stat.color}-500 opacity-60 hover:scale-125 transition-transform duration-300`} />
+                <IconComponent className={`w-6 h-6 sm:w-10 sm:h-10 text-${stat.color}-500 opacity-60 hover:scale-125 transition-transform duration-300`} />
               </div>
             </div>
             );
@@ -222,24 +222,24 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* My Groups */}
           <div className={`lg:col-span-2 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 transition-all duration-700 delay-300 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                <Users className="w-6 h-6 text-blue-600" /> {t('home.myLearningGroups')}
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center gap-2">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" /> {t('home.myLearningGroups')}
               </h2>
-              <button onClick={() => router.push('/groups')} className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all duration-200">
-                {t('home.viewAll')} <Search className="w-4 h-4" />
+              <button onClick={() => router.push('/groups')} className="text-blue-600 hover:text-blue-700 text-xs sm:text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all duration-200">
+                {t('home.viewAll')} <Search className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
             </div>
             {stats?.groups && stats.groups.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-3 sm:gap-4">
                 {stats.groups.slice(0, 4).map((group, index) => (
-                  <div key={group._id} onClick={() => router.push(`/groups/${group._id}`)} className="border border-gray-200 rounded-xl p-4 hover:border-blue-500 hover:shadow-lg cursor-pointer transition-all duration-300 hover:-translate-y-1 bg-white/50 animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+                  <div key={group._id} onClick={() => router.push(`/groups/${group._id}`)} className="border border-gray-200 rounded-xl p-3 sm:p-4 hover:border-blue-500 hover:shadow-lg cursor-pointer transition-all duration-300 hover:-translate-y-1 bg-white/50 animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
                     <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{group.subject}</h3>
-                        <p className="text-sm text-gray-600 mt-1">{group.topic}</p>
-                        <div className="flex items-center gap-2 mt-3">
-                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{group.subject}</h3>
+                        <p className="text-xs sm:text-sm text-gray-600 mt-1 truncate">{group.topic}</p>
+                        <div className="flex items-center gap-2 mt-2 sm:mt-3 flex-wrap">
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 sm:py-1 rounded-full">
                             {t('home.grade')} {group.grade}
                           </span>
                           <span className="text-xs text-gray-500 flex items-center gap-1">
@@ -247,17 +247,17 @@ export default function HomePage() {
                           </span>
                         </div>
                       </div>
-                      <BookOpen className="w-6 h-6 text-blue-500 hover:scale-110 transition-transform" />
+                      <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 hover:scale-110 transition-transform shrink-0 ml-2" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 animate-fade-in">
-                <Users className="w-20 h-20 text-gray-300 mx-auto mb-4 animate-bounce-in" />
-                <p className="text-gray-500 mb-4">{t('home.noGroups')}</p>
-                <button onClick={() => router.push('/groups')} className="px-6 py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-medium hover:scale-105 hover:shadow-lg flex items-center gap-2 mx-auto">
-                  <Search className="w-5 h-5" /> {t('home.exploreGroups')}
+              <div className="text-center py-8 sm:py-12 animate-fade-in">
+                <Users className="w-16 h-16 sm:w-20 sm:h-20 text-gray-300 mx-auto mb-3 sm:mb-4 animate-bounce-in" />
+                <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">{t('home.noGroups')}</p>
+                <button onClick={() => router.push('/groups')} className="px-4 sm:px-6 py-2 sm:py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-medium hover:scale-105 hover:shadow-lg flex items-center gap-2 mx-auto text-sm sm:text-base">
+                  <Search className="w-4 h-4 sm:w-5 sm:h-5" /> {t('home.exploreGroups')}
                 </button>
               </div>
             )}
@@ -285,7 +285,7 @@ export default function HomePage() {
                   const IconComponent = actionIconsMap[activity.actionType] || MessageSquare;
                   return (
                     <div key={activity._id} className="flex items-start gap-3 border-l-2 border-blue-500 pl-3 py-2 hover:bg-blue-50/50 transition-all duration-200 rounded-r-lg animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
-                      <IconComponent className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                      <IconComponent className="w-5 h-5 text-blue-600 shrink-0" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900">
                           <span className="capitalize">{activity.actionType.replace(/_/g, ' ')}</span>
@@ -306,55 +306,51 @@ export default function HomePage() {
         </div>
 
         {/* Quick Actions */}
-        <div className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 mb-8 transition-all duration-700 delay-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <Zap className="w-6 h-6 text-yellow-500" /> {t('home.quickActions')}
+        <div className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 transition-all duration-700 delay-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
+            <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" /> {t('home.quickActions')}
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button onClick={() => router.push('/groups')} className="p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 transition-all duration-300 group hover:scale-105 hover:shadow-lg">
-              <Search className="w-10 h-10 text-blue-500 mb-3 mx-auto group-hover:scale-125 transition-transform duration-300" />
-              <div className="text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">{t('home.actions.exploreGroups')}</div>
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
+            <button onClick={() => router.push('/groups')} className="p-3 sm:p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 transition-all duration-300 group hover:scale-105 hover:shadow-lg">
+              <Search className="w-6 h-6 sm:w-10 sm:h-10 text-blue-500 mb-1 sm:mb-3 mx-auto group-hover:scale-125 transition-transform duration-300" />
+              <div className="text-xs sm:text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors text-center">{t('home.actions.exploreGroups')}</div>
             </button>
-            <button onClick={() => router.push('/groups')} className="p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-green-500 hover:bg-green-50/50 transition-all duration-300 group hover:scale-105 hover:shadow-lg">
-              <PlusCircle className="w-10 h-10 text-green-500 mb-3 mx-auto group-hover:scale-125 transition-transform duration-300" />
-              <div className="text-sm font-medium text-gray-700 group-hover:text-green-600 transition-colors">{t('home.actions.createGroup')}</div>
+            <button onClick={() => router.push('/groups')} className="p-3 sm:p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-green-500 hover:bg-green-50/50 transition-all duration-300 group hover:scale-105 hover:shadow-lg">
+              <PlusCircle className="w-6 h-6 sm:w-10 sm:h-10 text-green-500 mb-1 sm:mb-3 mx-auto group-hover:scale-125 transition-transform duration-300" />
+              <div className="text-xs sm:text-sm font-medium text-gray-700 group-hover:text-green-600 transition-colors text-center">{t('home.actions.createGroup')}</div>
             </button>
-            <button onClick={() => router.push('/help')} className="p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50/50 transition-all duration-300 group hover:scale-105 hover:shadow-lg">
-              <HelpCircle className="w-10 h-10 text-purple-500 mb-3 mx-auto group-hover:scale-125 transition-transform duration-300" />
-              <div className="text-sm font-medium text-gray-700 group-hover:text-purple-600 transition-colors">{t('home.actions.getHelp')}</div>
+            <button onClick={() => router.push('/help')} className="p-3 sm:p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50/50 transition-all duration-300 group hover:scale-105 hover:shadow-lg">
+              <HelpCircle className="w-6 h-6 sm:w-10 sm:h-10 text-purple-500 mb-1 sm:mb-3 mx-auto group-hover:scale-125 transition-transform duration-300" />
+              <div className="text-xs sm:text-sm font-medium text-gray-700 group-hover:text-purple-600 transition-colors text-center">{t('home.actions.getHelp')}</div>
             </button>
-            {/* <button className="p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-orange-500 hover:bg-orange-50/50 transition-all duration-300 group hover:scale-105 hover:shadow-lg">
-              <Calendar className="w-10 h-10 text-orange-500 mb-3 mx-auto group-hover:scale-125 transition-transform duration-300" />
-              <div className="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors">{t('home.actions.scheduleSession')}</div>
-            </button> */}
           </div>
         </div>
 
         {/* User Reputation Section */}
         {user?.reputation && (
-          <div className={`bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl shadow-2xl p-8 text-white relative overflow-hidden transition-all duration-700 delay-600 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className={`bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl shadow-2xl p-5 sm:p-8 text-white relative overflow-hidden transition-all duration-700 delay-600 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <div className="absolute inset-0 overflow-hidden">
               <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
               <div className="absolute bottom-0 left-1/4 w-32 h-32 bg-white/10 rounded-full translate-y-1/2" />
             </div>
-            <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 relative z-10">
-              <Trophy className="w-6 h-6 animate-pulse" /> {t('home.yourImpact')}
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 flex items-center gap-2 relative z-10">
+              <Trophy className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" /> {t('home.yourImpact')}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-              <div className="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm hover:bg-white/20 transition-all duration-300 hover:scale-105">
-                <Award className="w-10 h-10 mx-auto mb-2 text-yellow-300" />
-                <p className="text-4xl font-bold mb-2">{user.reputation.points || 0}</p>
-                <p className="text-sm text-indigo-100">{t('home.reputation.points')}</p>
+            <div className="grid grid-cols-3 gap-3 sm:gap-6 relative z-10">
+              <div className="bg-white/10 rounded-xl p-3 sm:p-6 text-center backdrop-blur-sm hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <Award className="w-6 h-6 sm:w-10 sm:h-10 mx-auto mb-1 sm:mb-2 text-yellow-300" />
+                <p className="text-2xl sm:text-4xl font-bold mb-1 sm:mb-2">{user.reputation.points || 0}</p>
+                <p className="text-xs sm:text-sm text-indigo-100">{t('home.reputation.points')}</p>
               </div>
-              <div className="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm hover:bg-white/20 transition-all duration-300 hover:scale-105">
-                <Calendar className="w-10 h-10 mx-auto mb-2 text-green-300" />
-                <p className="text-4xl font-bold mb-2">{user.reputation.sessionsTaught || 0}</p>
-                <p className="text-sm text-indigo-100">{t('home.reputation.sessionsTaught')}</p>
+              <div className="bg-white/10 rounded-xl p-3 sm:p-6 text-center backdrop-blur-sm hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <Calendar className="w-6 h-6 sm:w-10 sm:h-10 mx-auto mb-1 sm:mb-2 text-green-300" />
+                <p className="text-2xl sm:text-4xl font-bold mb-1 sm:mb-2">{user.reputation.sessionsTaught || 0}</p>
+                <p className="text-xs sm:text-sm text-indigo-100">{t('home.reputation.sessionsTaught')}</p>
               </div>
-              <div className="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm hover:bg-white/20 transition-all duration-300 hover:scale-105">
-                <FileText className="w-10 h-10 mx-auto mb-2 text-blue-300" />
-                <p className="text-4xl font-bold mb-2">{user.reputation.resourcesShared || 0}</p>
-                <p className="text-sm text-indigo-100">{t('home.reputation.resourcesShared')}</p>
+              <div className="bg-white/10 rounded-xl p-3 sm:p-6 text-center backdrop-blur-sm hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <FileText className="w-6 h-6 sm:w-10 sm:h-10 mx-auto mb-1 sm:mb-2 text-blue-300" />
+                <p className="text-2xl sm:text-4xl font-bold mb-1 sm:mb-2">{user.reputation.resourcesShared || 0}</p>
+                <p className="text-xs sm:text-sm text-indigo-100">{t('home.reputation.resourcesShared')}</p>
               </div>
             </div>
           </div>
