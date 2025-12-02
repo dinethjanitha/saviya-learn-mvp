@@ -10,6 +10,12 @@ interface Analytics {
   suspendedUsers: number;
   adminCount: number;
   superadminCount: number;
+  totalGroups: number;
+  totalSessions: number;
+  totalResources: number;
+  activeSessions: number;
+  scheduledSessions: number;
+  completedSessions: number;
   recentActivities: Array<{
     _id: string;
     userId: string;
@@ -107,6 +113,72 @@ export default function AnalyticsPage() {
         <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
           <div className="text-sm font-medium text-slate-400 mb-2">Super Admins</div>
           <div className="text-3xl font-bold text-indigo-400">{analytics?.superadminCount || 0}</div>
+        </div>
+      </div>
+
+      {/* Platform Statistics */}
+      <div className="bg-slate-800 border border-slate-700 rounded-xl p-6">
+        <h2 className="text-lg font-semibold text-white mb-4">Platform Statistics</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-medium text-slate-400 mb-1">Total Learning Groups</div>
+                <div className="text-3xl font-bold text-blue-400">{analytics?.totalGroups || 0}</div>
+              </div>
+              <div className="text-4xl">👥</div>
+            </div>
+          </div>
+          
+          <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-medium text-slate-400 mb-1">Total Sessions</div>
+                <div className="text-3xl font-bold text-purple-400">{analytics?.totalSessions || 0}</div>
+              </div>
+              <div className="text-4xl">📅</div>
+            </div>
+          </div>
+          
+          <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-medium text-slate-400 mb-1">Total Resources</div>
+                <div className="text-3xl font-bold text-green-400">{analytics?.totalResources || 0}</div>
+              </div>
+              <div className="text-4xl">📚</div>
+            </div>
+          </div>
+          
+          <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-medium text-slate-400 mb-1">Active Sessions</div>
+                <div className="text-3xl font-bold text-orange-400">{analytics?.activeSessions || 0}</div>
+              </div>
+              <div className="text-4xl">🔴</div>
+            </div>
+          </div>
+          
+          <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-medium text-slate-400 mb-1">Scheduled Sessions</div>
+                <div className="text-3xl font-bold text-yellow-400">{analytics?.scheduledSessions || 0}</div>
+              </div>
+              <div className="text-4xl">⏰</div>
+            </div>
+          </div>
+          
+          <div className="bg-slate-700/50 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-medium text-slate-400 mb-1">Completed Sessions</div>
+                <div className="text-3xl font-bold text-cyan-400">{analytics?.completedSessions || 0}</div>
+              </div>
+              <div className="text-4xl">✅</div>
+            </div>
+          </div>
         </div>
       </div>
 
