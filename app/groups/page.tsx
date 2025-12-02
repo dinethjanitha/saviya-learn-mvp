@@ -637,7 +637,7 @@ function CreateGroupModal({ onClose, onSuccess }: { onClose: () => void; onSucce
                   <div className="text-xs text-gray-500">Anyone can join</div>
                 </div>
               </label>
-              <label className="flex-1 flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all">
+              {/* <label className="flex-1 flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all">
                 <input
                   type="radio"
                   value="private"
@@ -649,7 +649,7 @@ function CreateGroupModal({ onClose, onSuccess }: { onClose: () => void; onSucce
                   <div className="font-medium text-gray-900">🔐 Private</div>
                   <div className="text-xs text-gray-500">Invite only</div>
                 </div>
-              </label>
+              </label> */}
             </div>
           </div>
 
