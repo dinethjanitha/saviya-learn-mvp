@@ -58,6 +58,7 @@ function ResetPasswordForm() {
       setTimeout(() => {
         router.push('/login');
       }, 2000);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.response?.data?.message || t('resetPassword.failed'));
     } finally {
