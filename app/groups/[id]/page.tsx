@@ -543,17 +543,17 @@ export default function GroupDetailsPage() {
           <div className="flex border-b overflow-x-auto scrollbar-hide gap-1 p-2">
             {isMember && (
               <>
+                  <TabButton
+                    active={activeTab === 'resources'}
+                    onClick={() => setActiveTab('resources')}
+                    icon="📚"
+                    label="Resources"
+                  />
                 <TabButton
                   active={activeTab === 'chat'}
                   onClick={() => setActiveTab('chat')}
                   icon="💬"
                   label="Chat"
-                />
-                <TabButton
-                  active={activeTab === 'resources'}
-                  onClick={() => setActiveTab('resources')}
-                  icon="📚"
-                  label="Resources"
                 />
                 <TabButton
                   active={activeTab === 'sessions'}
@@ -1128,7 +1128,7 @@ function ResourcesTab({ groupId, user }: { groupId: string; user: any }) {
                   <span className="text-3xl ml-2 shrink-0">📄</span>
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 gap-3">
-                  <div className="text-xs text-gray-500 font-medium">
+                  <div className="text-[13px] text-gray-500 font-medium">
                     👁️ {resource.views || 0} views • 📅 {new Date(resource.createdAt).toLocaleDateString()}
                   </div>
                   <div className="flex gap-2 w-full sm:w-auto">

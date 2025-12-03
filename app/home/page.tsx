@@ -248,14 +248,14 @@ export default function HomePage() {
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           {[
+            { label: t('home.stats.resources'), value: stats?.statistics.resourceCount || 0, icon: FileText, color: 'purple', delay: '300' },
             { label: t('home.stats.myGroups'), value: stats?.statistics.groupCount || 0, icon: Users, color: 'blue', delay: '150' },
             { label: t('home.stats.sessionsJoined'), value: stats?.statistics.sessionCount || 0, icon: Calendar, color: 'green', delay: '200' },
             { label: t('home.stats.activeNow'), value: stats?.statistics.activeSessions || 0, icon: Zap, color: 'purple', delay: '250' },
-            { label: t('home.stats.resources'), value: stats?.statistics.resourceCount || 0, icon: FileText, color: 'purple', delay: '300' },
           ].map((stat) => {
             const IconComponent = stat.icon;
             return (
-            <div key={stat.label} className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-4 sm:p-6 border-l-4 border-${stat.color}-500 card-hover transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${stat.delay}ms` }}>
+            <div key={stat.label} className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-4 sm:p-6 border-l-4 card-hover transition-all duration-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${stat.delay}ms` }}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-500">{stat.label}</p>

@@ -164,7 +164,7 @@ export default function LandingPage() {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <div className="flex items-center gap-2 group cursor-pointer">
-              <BookOpen className="w-10 h-10 text-blue-600 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <img src={"/logohome.png"} className="w-10 h-10 text-blue-600 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
               <span className="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">{t('common.appName')}</span>
             </div>
 
