@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getUser } from '@/lib/axios';
@@ -58,77 +58,6 @@ function useTypewriter(text: string, speed: number = 50, pauseDuration: number =
   }, [text, speed, pauseDuration]);
 
   return { displayText, isTyping };
-}
-
-// Animated Counter Hook
-function useCountUp(end: number, duration: number = 2000, startOnView: boolean = true) {
-  const [count, setCount] = useState(0);
-  const [hasStarted, setHasStarted] = useState(!startOnView);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!startOnView) return;
-    
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !hasStarted) {
-          setHasStarted(true);
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => observer.disconnect();
-  }, [hasStarted, startOnView]);
-
-  useEffect(() => {
-    if (!hasStarted) return;
-
-    let startTime: number;
-    let animationFrame: number;
-
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      
-      // Easing function for smooth animation
-      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-      setCount(Math.floor(easeOutQuart * end));
-
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      } else {
-        setCount(end);
-      }
-    };
-
-    animationFrame = requestAnimationFrame(animate);
-
-    return () => cancelAnimationFrame(animationFrame);
-  }, [end, duration, hasStarted]);
-
-  return { count, ref };
-}
-
-// Counter Component
-function AnimatedCounter({ value, label, suffix = '+' }: { value: number; label: string; suffix?: string }) {
-  const { count, ref } = useCountUp(value, 2000);
-  
-  return (
-    <div 
-      ref={ref}
-      className="text-center p-6 rounded-2xl bg-white/70 backdrop-blur-sm border border-white/50"
-    >
-      <div className="text-4xl md:text-5xl font-bold text-blue-600 mb-2 tabular-nums">
-        {count.toLocaleString()}{suffix}
-      </div>
-      <div className="text-gray-600 font-medium">{label}</div>
-    </div>
-  );
 }
 
 export default function LandingPage() {
@@ -269,12 +198,50 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Stats with Animated Counters */}
-          <div className={`mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto transition-all duration-700 delay-500 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            <AnimatedCounter value={500} label={t('landing.activeStudents')} />
-            <AnimatedCounter value={50} label={t('landing.studyGroups')} />
-            <AnimatedCounter value={200} label={t('landing.tutoringSessions')} />
-            <AnimatedCounter value={95} label={t('landing.successRate')} suffix="%" />
+          {/* Trusted By Section with Floating Avatars */}
+          <div className={`mt-16 md:mt-20 transition-all duration-700 delay-500 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            {/* Floating Avatar Stack */}
+            <div className="flex items-center justify-center mb-6">
+              <div className="flex -space-x-3">
+                {[
+                  { bg: 'bg-gradient-to-br from-blue-400 to-blue-600', letter: 'A' },
+                  { bg: 'bg-gradient-to-br from-purple-400 to-purple-600', letter: 'S' },
+                  { bg: 'bg-gradient-to-br from-green-400 to-green-600', letter: 'K' },
+                  { bg: 'bg-gradient-to-br from-orange-400 to-orange-600', letter: 'N' },
+                  { bg: 'bg-gradient-to-br from-pink-400 to-pink-600', letter: 'M' },
+                ].map((avatar, index) => (
+                  <div
+                    key={index}
+                    className={`w-10 h-10 md:w-12 md:h-12 ${avatar.bg} rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white font-bold text-sm md:text-base hover:scale-110 hover:-translate-y-1 transition-all duration-300 cursor-pointer`}
+                    style={{ 
+                      animation: `float 3s ease-in-out infinite`,
+                      animationDelay: `${index * 0.2}s`
+                    }}
+                  >
+                    {avatar.letter}
+                  </div>
+                ))}
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-gray-600 font-bold text-xs md:text-sm hover:scale-110 transition-all duration-300 cursor-pointer">
+                  +99
+                </div>
+              </div>
+            </div>
+            
+            {/* Quick Stats Pills */}
+            <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mt-6">
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300">
+                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <span className="text-xs md:text-sm text-gray-700 font-medium">{t('landing.freeForever')}</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300">
+                <span className="text-xs md:text-sm">🇱🇰</span>
+                <span className="text-xs md:text-sm text-gray-700 font-medium">EN • සිං • தமி</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300">
+                <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                <span className="text-xs md:text-sm text-gray-700 font-medium">{t('landing.peerLearning')}</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -418,8 +385,17 @@ export default function LandingPage() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">
+                  <a href="mailto:p2pedusrilanka@gmail.com" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">
                     {t('help.contactUs')}
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:p2pedusrilanka@gmail.com" className="hover:text-white transition-all duration-300 hover:translate-x-1 inline-flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                    p2pedusrilanka@gmail.com
                   </a>
                 </li>
               </ul>

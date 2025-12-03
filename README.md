@@ -17,6 +17,14 @@
 
 [Live Demo](https://saviyalearn.vercel.app) · [Report Bug](https://github.com/dinethjanitha/saviya-learn-mvp/issues) · [Request Feature](https://github.com/dinethjanitha/saviya-learn-mvp/issues)
 
+<br />
+
+### 📈 Platform Statistics
+
+| 🎓 Active Students | 📚 Study Groups | 🎥 Tutoring Sessions | ✅ Success Rate |
+|:------------------:|:---------------:|:--------------------:|:---------------:|
+| **500+** | **50+** | **200+** | **95%** |
+
 </div>
 
 ---

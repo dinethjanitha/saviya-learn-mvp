@@ -87,6 +87,46 @@ export const translations = {
       si: 'පිවිසෙන්න',
       ta: 'உள்நுழை',
     },
+    trustedBy: {
+      en: 'Trusted by students',
+      si: 'සිසුන් විශ්වාස කරයි',
+      ta: 'மாணவர்களால் நம்பப்படுகிறது',
+    },
+    studentsAcross: {
+      en: 'across Sri Lanka',
+      si: 'මුළු ශ්‍රී ලංකාවේම',
+      ta: 'இலங்கை முழுவதும்',
+    },
+    freeForever: {
+      en: '100% Free',
+      si: '100% නොමිලේ',
+      ta: '100% இலவசம்',
+    },
+    noHiddenFees: {
+      en: 'No hidden fees',
+      si: 'සැඟවුණු ගාස්තු නැත',
+      ta: 'மறைக்கப்பட்ட கட்டணங்கள் இல்லை',
+    },
+    trilingual: {
+      en: 'Trilingual',
+      si: 'ත්‍රිභාෂා',
+      ta: 'மும்மொழி',
+    },
+    learnTogether: {
+      en: 'Study with friends',
+      si: 'මිතුරන් සමඟ ඉගෙන ගන්න',
+      ta: 'நண்பர்களுடன் படியுங்கள்',
+    },
+    alwaysAvailable: {
+      en: '24/7 Access',
+      si: '24/7 ප්‍රවේශය',
+      ta: '24/7 அணுகல்',
+    },
+    accessAnytime: {
+      en: 'Learn anytime',
+      si: 'ඕනෑම වේලාවක ඉගෙන ගන්න',
+      ta: 'எப்போது வேண்டுமானாலும் கற்றுக்கொள்ளுங்கள்',
+    },
     activeStudents: {
       en: 'Active Students',
       si: 'සක්‍රීය සිසුන්',
